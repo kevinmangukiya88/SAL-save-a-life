@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "825366915015",
+    "project_id": "sal-therapist-app",
+    "storage_bucket": "sal-therapist-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825366915015:android:5ba4d9414468ef550cdbe2",
+        "android_client_info": {
+          "package_name": "com.sal_foundation.therapist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "825366915015-0oi0vhoru0mh9s1fkcrft04k3kgvaj94.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyfVb8wpULqeH4UtILe_TvXaImM4fugr0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "825366915015-0oi0vhoru0mh9s1fkcrft04k3kgvaj94.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "825366915015-cda6ordde2dgn1ovlg97l0hbrtu64i6u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sal-foundation.therapist"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

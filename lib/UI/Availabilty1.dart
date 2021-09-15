@@ -1,364 +1,343 @@
+import 'package:date_format/date_format.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mental_health/UI/avialllll.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:mental_health/Utils/Colors.dart';
-import 'package:mental_health/Utils/SizeConfig.dart';
-import 'package:mental_health/data/repo/newavail.dart';
-import 'package:mental_health/models/avalabilitymodel.dart';
 
 class Availability extends StatefulWidget {
-  const Availability({Key key}) : super(key: key);
+  final List<DateTime> dates;
+  final DateTime selectedTimeFrom;
+  final DateTime selectedTimeTo;
+  final bool breakTime;
+  final Map<String, bool> statusMap;
+
+  const Availability(
+      {Key key,
+      this.dates,
+      this.selectedTimeFrom,
+      this.selectedTimeTo,
+      this.breakTime,
+      this.statusMap})
+      : super(key: key);
+
   @override
   _AvailabilityState createState() => _AvailabilityState();
 }
 
 class _AvailabilityState extends State<Availability> {
-  AvailabiltiyModel availabiltiyModel;
+  Map<String, bool> statusMap = {};
 
-  List arr = [];
-  var moodstatic = [
-    "00:00-00:30",
-    "0:30-01:00",
-    "01:00-1:30",
-    "02:0-2.30",
-    "02:30-3:00",
-    "03:00-3:30",
-    "03:30-4:00",
-    "04:00-4:30",
-    "04:30-5:00",
-    "05:00-5:30",
-    "05:30-6:00",
-    "06:00-6:30",
-    "06:30-7:00",
-    "07:00-7:30",
-    "08:00-8:30",
-    "08:30-9:00",
-    "09:00-9:30",
-    "09:30-10:00",
-    "10:00-10:30",
-    "10:30-11:00",
-    "11:00-11:30",
-    "12:0-12.30",
-    "12:30-13:00",
-    "13:00-13:30",
-    "13:30-14:00",
-    "14:00-14:30",
-    "14:30-15:00",
-    "15:00-15:30",
-    "15:30-16:00",
-    "16:00-16:30",
-    "16:30-17:00",
-    "17:00-17:30",
-    "18:00-18:30",
-    "18:30-19:00",
-    "19:00-19:30",
-    "19:30-20:00",
-    '20:00-20:30',
-    '20:30-21:00',
-    "21:00-21:30",
-    "21:30-22:00",
-    "22:00-22:30",
-    "22:30-23:00",
-    "23:00-23:30",
-    "23:30-24:00"
-  ];
-  bool isloading = false;
+  ShowTimesController _controller = Get.find();
+  DateTime now = DateTime.now();
+  List<DateTime> dateList = <DateTime>[];
+
+  List<DateTime> oldDateList = <DateTime>[];
+  List<String> deletedDay = [];
+
   @override
   void initState() {
-    final testMap = {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5};
-    for (final mapEntry in testMap.entries) {
-      final key = mapEntry.key;
-      final value = mapEntry.value;
-      print(value); // Key: a, Value: 1 ...
-    }
-    getapi();
-    //toast(value.meta.message);
-    /*  SharedPreferencesTest().checkIsLogin("0");
-                                          SharedPreferencesTest()
-                                              .saveToken("set", value: value.token);*/
-
-    //       /*  Navigator.push(context,
-    //           MaterialPageRoute(
-    //               builder: (conext) {
-    //                 return OTPScreen(
-    //                   phoneNumber: mobileController.text,
-    //                 );
-    //               }));*/
-    //     } else {
-    //       showAlertDialog(
-    //         context,
-    //         value.meta.message,
-    //         "",
-    //       );
-    //     }
-    //   } else {
-    //     showAlertDialog(
-    //       context,
-    //       "No data found",
-    //       "",
-    //     );
-    //   }
-    // }).catchError((error) {
-    //   showAlertDialog(
-    //     context,
-    //     error.toString(),
-    //     "",
-    //   );
-    // });
-    // TODO: implement initState
-    //  getnotescount();
-
-    //   for (final mapEntry in availabiltiyModel.availability[1].entries) {
-    //   final key = mapEntry.key;
-    //   final value = mapEntry.value;
-    //   print('Key: $key, Value: $value');  // Key: a, Value: 1 ...
-    // }
     super.initState();
+    _controller.setIsDeleteStatus(false);
+    _controller.clearDeleteStatusMap();
+    oldDateList = widget.dates;
+    setDateList();
   }
 
-  List<String> time = [
-    '12:00 - 17:00 PM',
-    '12:00 - 17:00 PM',
-    '17:00 - 19:00 PM',
-    '17:00 - 19:00 PM'
-  ];
-  List<bool> switches = [true, true, false, false];
-  List<String> day = [
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY' 'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY',
-    'TOMORROW',
-    'EVERYDAY',
-    'SUN,MON,WED',
-    'MONDAY'
-  ];
-  List<bool> selected = [false, false, false, false];
+  void setDateList() {
+    int totalDays = DateTime(now.year, now.month + 1, 0).day;
 
-  bool selectedCheckbox = true;
-  bool showDelete = false;
+    int everyDayCount = 0;
+    int sundayCount = dayCount('Sunday');
+    int mondayCount = dayCount('Monday');
+    int tuesdayCount = dayCount('Tuesday');
+    int wednesdayCount = dayCount('Wednesday');
+    int thursdayCount = dayCount('Thursday');
+    int fridayCount = dayCount('Friday');
+    int saturdayCount = dayCount('Saturday');
+    for (int index = 1; index <= totalDays; index++) {
+      DateTime date = DateTime(now.year, now.month, index);
+      dateList.add(date);
+      int availableStatus = widget.dates
+          .indexWhere((element) => element.difference(date).inDays == 0);
+      if (availableStatus != -1) {
+        everyDayCount++;
+      }
+    }
+    int currentSundayCount = dayCount('Sunday', dates: dateList);
+    int currentMondayCount = dayCount('Monday', dates: dateList);
+    int currentTuesdayCount = dayCount('Tuesday', dates: dateList);
+    int currentWednesdayCount = dayCount('Wednesday', dates: dateList);
+    int currentThursdayCount = dayCount('Thursday', dates: dateList);
+    int currentFridayCount = dayCount('Friday', dates: dateList);
+    int currentSaturdayCount = dayCount('Saturday', dates: dateList);
+    print('web:${tuesdayCount} $currentTuesdayCount ');
+    if (totalDays == everyDayCount) {
+      statusMap.addAll({'EVERYDAY': statusMap['EVERYDAY'] ?? false});
+      return;
+    }
+    if (sundayCount == currentSundayCount) {
+      statusMap.addAll({'SUNDAY': widget.statusMap['SUNDAY'] ?? false});
+    } else {
+      setDateInMap('Sunday');
+    }
+    if (mondayCount == currentMondayCount) {
+      statusMap.addAll({'MONDAY': widget.statusMap['MONDAY'] ?? false});
+    } else {
+      setDateInMap('Monday');
+    }
+    if (tuesdayCount == currentTuesdayCount) {
+      statusMap.addAll({'TUESDAY': widget.statusMap['TUESDAY'] ?? false});
+    } else {
+      setDateInMap('Tuesday');
+    }
+    if (wednesdayCount == currentWednesdayCount) {
+      statusMap.addAll({'WEDNESDAY': widget.statusMap['WEDNESDAY'] ?? false});
+    } else {
+      setDateInMap('Wednesday');
+    }
+    if (thursdayCount == currentThursdayCount) {
+      statusMap.addAll({'THURSDAY': widget.statusMap['THURSDAY'] ?? false});
+    } else {
+      setDateInMap('Thursday');
+    }
+    if (fridayCount == currentFridayCount) {
+      statusMap.addAll({'FRIDAY': widget.statusMap['FRIDAY'] ?? false});
+    } else {
+      setDateInMap('Friday');
+    }
+    if (saturdayCount == currentSaturdayCount) {
+      statusMap.addAll({'SATURDAY': widget.statusMap['SATURDAY'] ?? false});
+    } else {
+      setDateInMap('Saturday');
+    }
 
-  bool switch1 = false;
+    setState(() {});
+  }
+
+  String days(
+    DateTime date,
+  ) {
+    return DateFormat('EEEE').format(date);
+  }
+
+  void setDateInMap(
+    String day,
+  ) {
+    widget.dates.forEach((element) {
+      if (days(element) == day) {
+        statusMap.addAll({
+          DateFormat('dd-MM-yyyy').format(element):
+              widget.statusMap[DateFormat('dd-MM-yyyy').format(element)] ??
+                  false
+        });
+      }
+    });
+  }
+
+  int dayCount(String day, {List<DateTime> dates}) {
+    return (dates ?? widget.dates).fold(
+        0,
+        (previousValue, element) =>
+            previousValue + (days(element) == day ? 1 : 0));
+  }
+
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    return SafeArea(
-        child: Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        centerTitle: true,
-        title: Text(
-          "Availability",
-          style: TextStyle(color: Color(midnightBlue)),
-        ),
-        leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
+    return WillPopScope(
+      onWillPop: () {
+        Get.back(result: {
+          'statusMap': statusMap,
+          'dates': oldDateList,
+          'deletedDays': deletedDay
+        });
+        return Future.value(
+          true,
+        );
+      },
+      child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: customAppbar(context),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Color(backgroundColorBlue),
+            child: Icon(Icons.add),
+            onPressed: () {
+              Get.back(result: {
+                'statusMap': statusMap,
+                'dates': oldDateList,
+                'deletedDays': deletedDay
+              });
             },
-            child:
-                Icon(Icons.arrow_back_ios_rounded, color: Color(midnightBlue))),
-        actions: [
-          Container(
-            margin: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal * 5),
-            child: showDelete == false
-                ? ImageIcon(
-                    AssetImage('assets/icons/delete.png'),
-                    color: Color(fontColorGray),
-                    size: SizeConfig.blockSizeVertical * 2,
-                  )
-                : Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Delete",
-                      style: TextStyle(
-                          color: Color(backgroundColorBlue),
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
           ),
-        ],
-      ),
+          body: GestureDetector(
+            onTap: () {
+              _controller.setIsDeleteStatus(false);
+            },
+            child: GetBuilder<ShowTimesController>(
+              builder: (controller) {
+                return ListView(
+                  children: statusMap.keys
+                      .toList()
+                      .map((e) => ListTile(
+                            title: Text(
+                                '${DateFormat.jm().format(widget.selectedTimeFrom)} - ${DateFormat.jm().format(widget.selectedTimeTo)}'),
+                            trailing: controller.isDeleteStatus.value
+                                ? Checkbox(
+                                    value: controller.deleteStatusMap.isEmpty
+                                        ? false
+                                        : !controller.deleteStatusMap
+                                                .containsKey(e)
+                                            ? false
+                                            : controller
+                                                .deleteStatusMap.value[e],
+                                    onChanged: (value) {
+                                      _controller
+                                          .setDeleteStatusMap({e: value});
+                                    },
+                                  )
+                                : CupertinoSwitch(
+                                    value: statusMap[e],
+                                    onChanged: (value) {
+                                      setState(() {
+                                        statusMap.addAll({e: value});
+                                      });
+                                    },
+                                  ),
+                            subtitle: Text(e.replaceAll('DAY', '')),
+                          ))
+                      .toList(),
+                );
+              },
+            ),
+          )),
+    );
+  }
+
+  AppBar customAppbar(BuildContext context) {
+    return AppBar(
       backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: Color(backgroundColorBlue),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      elevation: 0.0,
+      centerTitle: true,
+      title: Text(
+        "Availability",
+        style: TextStyle(color: Colors.black),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: Stack(
-        children: [
-          isloading == true
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: getvalues(),
-                    // children: [
-                    //   Container(
-                    //       width: SizeConfig.screenWidth,
-                    //       margin: EdgeInsets.symmetric(
-                    //           horizontal: SizeConfig.screenWidth * 0.02,
-                    //           vertical: SizeConfig.blockSizeVertical),
-                    //       child: ListView.builder(
-                    //         itemBuilder: (BuildContext context, int index) {
-                    //           return ListTile(
-                    //               onLongPress: () {
-                    //                 setState(() {
-                    //                   selected[index] = true;
-                    //                   showDelete = true;
-                    //                 });
-                    //               },
-                    //               onTap: () {
-                    //                 setState(() {
-                    //                   selected[index] = false;
-                    //                   showDelete = false;
-                    //                 });
-                    //               },
-                    //               tileColor: selected[index] == false
-                    //                   ? Colors.white
-                    //                   : Color(0XFFF8F8F8),
-                    //               title: Text(time[index]),
-                    //               subtitle: Text(day[index]),
-                    //               dense: true,
-                    //               trailing: selected[index] == false
-                    //                   ? Switch(
-                    //                       value: switches[index],
-                    //                       onChanged: (value) {
-                    //                         setState(() {
-                    //                           switches[index] = value;
-                    //                         });
-                    //                       },
-                    //                       activeColor: Color(backgroundColorBlue),
-                    //                       inactiveThumbColor: Color(fontColorGray),
-                    //                       activeTrackColor: Color(0XFFDBE6F5),
-                    //                       inactiveTrackColor: Color(0XFFD8DFE9),
-                    //                     )
-                    //                   : Checkbox(
-                    //                       value: selectedCheckbox,
-                    //                       onChanged: (value) {
-                    //                         selectedCheckbox = value;
-                    //                       }));
-                    //         },
-                    //         shrinkWrap: true,
-                    //         physics: NeverScrollableScrollPhysics(),
-                    //         itemCount: time.length,
-                    //         primary: false,
-                    //       )),
-                    // ],
-                  ),
-                ),
-        ],
-      ),
-    ));
+      leading: InkWell(
+          onTap: () {
+            Get.back(result: {
+              'statusMap': statusMap,
+              'dates': oldDateList,
+              'deletedDays': deletedDay
+            });
+          },
+          child: Icon(Icons.arrow_back_ios_rounded,
+              color: Color(backgroundColorBlue))),
+      actions: [
+        GetBuilder<ShowTimesController>(
+          builder: (controller) {
+            return statusMap.isEmpty
+                ? SizedBox()
+                : !controller.isDeleteStatus.value
+                    ? deleteIcon()
+                    : deleteTextBtn(controller);
+          },
+        )
+      ],
+    );
   }
 
-  List<Widget> getvalues() {
-    setState(() {
-      isloading = true;
-    });
-    bool switchvalue = false;
-    bool sw = false;
-    List<Widget> productList = new List();
-    for (int i = 0; i < moodstatic.length; i++) {
-      if (arr[i].toString() == "0") {
-        setState(() {
-          switchvalue = true;
-        });
-      } else {
-        setState(() {
-          switchvalue = false;
-        });
-      }
-      productList.add(avialll(
-        time: moodstatic[i],
-        subtitle: day[i],
-        switche: switchvalue,
-      ));
-    }
-    return productList;
-  }
+  Widget deleteTextBtn(ShowTimesController controller) {
+    return TextButton(
+      onPressed: () {
+        controller.deleteStatusMap.value.forEach((key, value) {
+          if (key == 'SUNDAY' ||
+              key == 'MONDAY' ||
+              key == 'TUESDAY' ||
+              key == 'WEDNESDAY' ||
+              key == 'THURSDAY' ||
+              key == 'FRIDAY' ||
+              key == 'SATURDAY') {
+            List<DateTime> deletedDate = [];
+            for (int index = 0; index < widget.dates.length; index++) {
+              if (days(widget.dates[index]).toUpperCase() == key) {
+                deletedDate.add(widget.dates[index]);
+              }
+            }
 
-  getapi() {
-    isloading = true;
-    AddedRelationListRepo.getAddRelationList().then((value) {
-      if (value != null) {
-        if (value.meta.status == "200") {
-          setState(() {
-            isloading = false;
-          });
-          availabiltiyModel = AvailabiltiyModel(
-              availability: value.availability, meta: value.meta);
-          // print(availabiltiyModel.availability);
-          for (final mapEntry in availabiltiyModel.availability[1].entries) {
-            final key = mapEntry.key;
-            final value = mapEntry.value;
-            print('Key: $key, Value: $value');
-            arr.add(value);
-            // Key: a, Value: 1 ...
+            oldDateList = oldDateList
+                .where((element) => !deletedDate.contains(element))
+                .toList();
+          } else {
+            int index = widget.dates.indexWhere(
+                (element) => key == DateFormat('dd-MM-yyyy').format(element));
+            if (index > -1) {
+              oldDateList.removeAt(index);
+            }
           }
-        }
-      }
-    });
+          if (value) {
+            deletedDay.add(key.trim());
+            statusMap.remove(key);
+          }
+        });
+        setState(() {});
+        _controller.setIsDeleteStatus(false);
+      },
+      child: Text(
+        "Delete",
+        style: TextStyle(
+            color: Color(backgroundColorBlue), fontWeight: FontWeight.w600),
+      ),
+    );
   }
+
+  IconButton deleteIcon() {
+    return IconButton(
+        onPressed: () {
+          _controller.setIsDeleteStatus(true);
+        },
+        icon: Icon(
+          Icons.delete_outline,
+          color: Colors.grey[700],
+        ));
+  }
+}
+
+class ShowTimesController extends GetxController {
+  RxBool _isDeleteStatus = false.obs;
+
+  RxBool get isDeleteStatus => _isDeleteStatus;
+
+  void setIsDeleteStatus(bool value) {
+    _isDeleteStatus = value.obs;
+    update();
+  }
+
+  RxMap<String, bool> _deleteStatusMap = <String, bool>{}.obs;
+
+  RxMap<String, bool> get deleteStatusMap => _deleteStatusMap;
+
+  void setDeleteStatusMap(Map<String, bool> value) {
+    _deleteStatusMap.addAll(value);
+    update();
+  }
+
+  void clearDeleteStatusMap() {
+    _deleteStatusMap.clear();
+    update();
+  }
+/* RxMap<String, bool> _switchStatusMap = <String, bool>{}.obs;
+
+  RxMap<String, bool> get switchStatusMap => _switchStatusMap;
+
+  void setSwitchStatusMap(Map<String, bool> value) {
+    _switchStatusMap.addAll(value);
+    update();
+  }
+
+  void clearSwitchStatusMap() {
+    _switchStatusMap.clear();
+    update();
+  }*/
 }

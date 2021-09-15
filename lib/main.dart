@@ -35,15 +35,13 @@ import 'package:mental_health/UI/ProfessionalInfo1.dart';
 import 'package:mental_health/UI/ProfessionalInfo2.dart';
 import 'package:mental_health/UI/Settings.dart';
 import 'package:mental_health/models/VerifyOtpModal.dart';
-import 'package:mental_health/show_times.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'UI/CancelAppointment.dart';
 import 'UI/LoginScreen.dart';
-import 'UI/stremusingapi.dart';
 import 'Utils/SharedPref.dart';
-import 'demo.dart';
 
 Therapist getTherapistData;
+
 void main() {
   runApp(MentalHealth());
 }
@@ -55,6 +53,7 @@ class MentalHealth extends StatefulWidget {
 
 class _MentalHealthState extends State<MentalHealth> {
   String _textFromFile;
+
   @override
   void initState() {
     super.initState();
@@ -104,8 +103,8 @@ class _MentalHealthState extends State<MentalHealth> {
           '/AboutSAL': (context) => AboutSAL(),
           '/Help': (context) => Help(),
           '/Settings': (context) => Settings(),
-          // '/AvailabilityFirst': (context) => AvailabilityFirst(),
-          '/AvailabilityFirst': (context) => Demo(),
+          '/AvailabilityFirst': (context) => AvailabilityFirst(),
+          // '/AvailabilityFirst': (context) => Demo(),
           '/CafeEvents': (context) => CafeEvents(),
           '/CafeEventsDetails': (context) => CafeEventsDetails(),
           '/AddNewEvent': (context) => AddNewEvent(),

@@ -40,7 +40,7 @@ dependencies:
   nb_utils: ^4.2.11
   table_calendar: ^2.1.0
   url_launcher:
-  intl: ^0.17.0
+  intl: any
   date_format: ^2.0.2
   cached_network_image:
   otp_text_field: ^1.1.1
@@ -57,7 +57,8 @@ dependencies:
   permission_handler: ^5.0.1
   syncfusion_flutter_datepicker: ^19.1.55-beta
   get: ^3.26.0
-
+  some_calendar: ^1.2.0
+  jiffy: ^3.0.1
 
 dev_dependencies:
   flutter_test:

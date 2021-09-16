@@ -1,9 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:mental_health/Utils/Colors.dart';
 import 'package:mental_health/Utils/SizeConfig.dart';
+import 'package:mental_health/controller/availability_controller.dart';
+import 'package:mental_health/models/availabilityModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import 'Availabilty1.dart';
@@ -16,7 +21,6 @@ class AvailabilityFirst extends StatefulWidget {
 }
 
 class _AvailabilityFirstState extends State<AvailabilityFirst> {
-  Map<String, bool> statusMap = {};
   List<String> dayList = [
     'Sunday',
     'Monday',
@@ -26,19 +30,23 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
     'Friday',
     'Saturday'
   ];
-  List<DateTime> selectedDates = <DateTime>[DateTime.now()];
+  ShowTimesController _controller = Get.find();
+
+  List<DateTime> selectedDates = <DateTime>[];
   List<String> selectedDays = <String>[];
   DateRangePickerController controller = DateRangePickerController();
   DateTime now = DateTime.now();
-  DateTime selectedTimeFrom = DateTime.now();
-  DateTime selectedTimeTo = DateTime.now();
+  DateTime selectedTimeFrom;
+  DateTime selectedTimeTo;
   RxBool breakTime = false.obs;
   RxBool isExpanded = true.obs;
+  int startTimeIndex, endTimeIndex;
 
   @override
   void initState() {
+    selectedTimeFrom = setTime(DateTime.now());
+    selectedTimeTo = setTime(DateTime.now());
     super.initState();
-    controller.selectedDates = [now];
   }
 
   @override
@@ -46,133 +54,146 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: customAppbar(context),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: Row(
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Column(
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Row(
                   children: [
-                    Text(
-                      'FROM',
-                      style: fromToHeaderStyle(),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'FROM',
+                          style: fromToHeaderStyle(),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _selectFromTime(context);
+                          },
+                          child: Text(
+                            "${DateFormat.jm().format(selectedTimeFrom)}",
+                            style: TextStyle(
+                                fontSize: SizeConfig.blockSizeVertical * 2.3,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ],
                     ),
+                    Spacer(),
+                    Spacer(),
                     TextButton(
                       onPressed: () {
-                        _selectFromTime(context);
+                        _selectToTime(context);
                       },
-                      child: Text(
-                        "${DateFormat.jm().format(selectedTimeFrom)}",
-                        style: TextStyle(
-                            fontSize: SizeConfig.blockSizeVertical * 2.3,
-                            color: Colors.black),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'TO',
+                            style: fromToHeaderStyle(),
+                          ),
+                          Text(
+                            "${DateFormat.jm().format(selectedTimeTo)}",
+                            style: TextStyle(
+                                fontSize: SizeConfig.blockSizeVertical * 2.3,
+                                color: Colors.black),
+                          ),
+                        ],
                       ),
                     ),
+                    Spacer(),
                   ],
                 ),
-                Spacer(),
-                Spacer(),
-                TextButton(
-                  onPressed: () {
-                    _selectToTime(context);
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'TO',
-                        style: fromToHeaderStyle(),
-                      ),
-                      Text(
-                        "${DateFormat.jm().format(selectedTimeTo)}",
-                        style: TextStyle(
-                            fontSize: SizeConfig.blockSizeVertical * 2.3,
-                            color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
-                Spacer(),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "REPEAT",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    color: Color(fontColorGray),
-                  ),
-                ),
-                Obx(() => IconButton(
-                      onPressed: () {
-                        isExpanded.toggle();
-                      },
-                      icon: Icon(
-                        isExpanded.value
-                            ? Icons.keyboard_arrow_down_rounded
-                            : Icons.keyboard_arrow_up_rounded,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "REPEAT",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
                         color: Color(fontColorGray),
                       ),
-                    )),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          _daysText(),
-          SizedBox(
-            height: 20,
-          ),
-          Obx(() => !isExpanded.value
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Divider(),
-                )
-              : SfDateRangePicker(
-                  controller: controller,
-                  showNavigationArrow: true,
-                  view: DateRangePickerView.month,
-                  headerStyle: DateRangePickerHeaderStyle(
-                      textAlign: TextAlign.center,
-                      textStyle: fromToHeaderStyle()),
-                  initialSelectedDate: DateTime.now(),
-                  selectionColor: Color(backgroundColorBlue),
-                  selectionMode: DateRangePickerSelectionMode.multiple,
-                  onSelectionChanged: (dateRangePickerSelectionChangedArgs) {
-                    List<DateTime> list =
-                        dateRangePickerSelectionChangedArgs.value;
-                    print('list :$list');
-                    print('on Change selectedDates :$selectedDates');
-                    for (DateTime date in list) {
-                      int index = selectedDates
-                          .indexWhere((e) => e.difference(date).inDays == 0);
-                      if (index == -1) {
-                        selectedDates.add(date);
-                      }
-                    }
-                    print('selectedDates Add :$selectedDates');
-                  },
-                )),
-          Obx(() => CheckboxListTile(
-                controlAffinity: ListTileControlAffinity.leading,
-                value: breakTime.value,
-                onChanged: (value) {
-                  breakTime.toggle();
-                },
-                title: Text(
-                  'Provide 30 minutes break after each session',
+                    ),
+                    Obx(() => IconButton(
+                          onPressed: () {
+                            isExpanded.toggle();
+                          },
+                          icon: Icon(
+                            isExpanded.value
+                                ? Icons.keyboard_arrow_down_rounded
+                                : Icons.keyboard_arrow_up_rounded,
+                            color: Color(fontColorGray),
+                          ),
+                        )),
+                  ],
                 ),
-              )),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              _daysText(),
+              SizedBox(
+                height: 20,
+              ),
+              Obx(() => !isExpanded.value
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Divider(),
+                    )
+                  : AbsorbPointer(
+                      absorbing: true,
+                      child: SfDateRangePicker(
+                        controller: controller,
+                        showNavigationArrow: false,
+                        allowViewNavigation: false,
+                        navigationMode: DateRangePickerNavigationMode.none,
+                        view: DateRangePickerView.month,
+                        headerStyle: DateRangePickerHeaderStyle(
+                            textAlign: TextAlign.center,
+                            textStyle: fromToHeaderStyle()),
+                        selectionColor: Color(backgroundColorBlue),
+                        toggleDaySelection: false,
+                        selectionMode: DateRangePickerSelectionMode.multiple,
+                        onSelectionChanged: null,
+                        cellBuilder: null,
+                        onViewChanged: null,
+                      ),
+                    )),
+              Obx(() => CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    value: breakTime.value,
+                    onChanged: (value) {
+                      breakTime.toggle();
+                    },
+                    title: Text(
+                      'Provide 30 minutes break after each session',
+                    ),
+                  )),
+            ],
+          ),
+          GetBuilder<ShowTimesController>(
+            builder: (controller) {
+              if (controller.addAvailabilityApiResponse.value ==
+                  Status.LOADING) {
+                return Container(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  color: Colors.black38,
+                );
+              }
+              return SizedBox();
+            },
+          )
         ],
       ),
     );
@@ -257,31 +278,20 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
       actions: [
         TextButton(
           onPressed: () async {
-            print("before statusMap:$statusMap");
-            var data = await Get.to(Availability(
-              dates: controller.selectedDates,
-              selectedTimeFrom: selectedTimeFrom,
-              selectedTimeTo: selectedTimeTo,
-              breakTime: breakTime.value,
-              statusMap: statusMap,
-            ));
-            if (data['deletedDays'].contains('EVERYDAY')) {
-              statusMap.clear();
-              selectedDates.clear();
-              selectedDays.clear();
-              controller.selectedDates.clear();
-              setState(() {});
+            if (selectedTimeTo.difference(selectedTimeFrom).inMinutes == 0) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content:
+                      Text('Please Select To Time Greater than From Time')));
               return;
             }
-            statusMap = data['statusMap'];
-            selectedDates = data['dates'];
-            selectedDays = selectedDays
-                .where((element) =>
-                    !data['deletedDays'].contains(element.toUpperCase()))
-                .toList();
-            controller.selectedDates = selectedDates;
-            setState(() {});
-            print("after statusMap...:$data");
+            // AvailabilityModel model = AvailabilityModel();
+            // model.selectedDays = selectedDays;
+            // model.breakTime = breakTime.value;
+            // model.selectedTimeTo = selectedTimeTo;
+            // model.selectedTimeFrom = selectedTimeFrom;
+            // model.selectedDates = selectedDates;
+            setTimeSlot();
+            // Get.back();
           },
           child: Text(
             "Save",
@@ -301,16 +311,14 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
     if (picked != null) {
       DateTime dateTime =
           DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
-      print('time:${dateTime.difference(selectedTimeFrom).inMinutes}');
-
+      dateTime = setTime(dateTime);
       if (dateTime.difference(selectedTimeFrom).inMinutes < 0) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Please Select Greater than From Time')));
         return;
       }
       setState(() {
-        selectedTimeTo =
-            DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+        selectedTimeTo = dateTime;
       });
     }
   }
@@ -323,7 +331,7 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
     if (picked != null) {
       DateTime dateTime =
           DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
-      print('time:${dateTime.difference(selectedTimeTo).inMinutes}');
+      dateTime = setTime(dateTime);
 
       if (dateTime.difference(selectedTimeTo).inMinutes > 0) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -331,9 +339,88 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
         return;
       }
       setState(() {
-        selectedTimeFrom =
-            DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+        selectedTimeFrom = dateTime;
       });
+    }
+  }
+
+  DateTime setTime(DateTime dateTime) {
+    if (dateTime.minute > 0 && dateTime.minute < 30) {
+      dateTime = dateTime.subtract(Duration(minutes: dateTime.minute));
+      dateTime = dateTime.add(Duration(minutes: 30));
+    } else if (dateTime.minute > 30) {
+      dateTime = dateTime.subtract(Duration(minutes: dateTime.minute));
+      dateTime = dateTime.add(Duration(hours: 1));
+    }
+    return dateTime;
+  }
+
+  Future<void> setTimeSlot() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var id = prefs.getString("therapistid");
+    List<Map<String, dynamic>> requestList = [];
+
+    startTimeIndex =
+        (selectedTimeFrom.hour * 2) + (selectedTimeFrom.minute == 30 ? 1 : 0);
+    endTimeIndex =
+        (selectedTimeTo.hour * 2) + (selectedTimeTo.minute == 30 ? 1 : 0);
+    print('satrt index :$startTimeIndex , end index :$endTimeIndex');
+    for (String day in selectedDays) {
+      Map<String, dynamic> mapData = {};
+      int breakStatusCount = 0;
+      // bool breakStatus = false;
+      for (int index = 0; index < 48; index++) {
+        if (index >= startTimeIndex && index <= endTimeIndex) {
+          if (breakTime.value && breakStatusCount == 2) {
+            mapData.addAll({'$index': "0"});
+            breakStatusCount = 0;
+          } else {
+            breakStatusCount++;
+            mapData.addAll({'$index': "1"});
+          }
+        } else {
+          mapData.addAll({'$index': "0"});
+        }
+      }
+      mapData.addAll({'weekday': setWeekIndex(day)});
+      mapData.addAll({'counsellor_id': id});
+      // mapData.addAll({'availability_status': 'false'});
+      requestList.add(mapData);
+    }
+    log('request:$requestList');
+
+    await _controller.addAvailability(requestList);
+    if (_controller.addAvailabilityApiResponse.value == Status.COMPLETE) {
+      Get.showSnackbar(GetBar(
+        message: 'Availability Saved Successfully',
+        duration: Duration(seconds: 2),
+      ));
+      Future.delayed(Duration(seconds: 3), () {
+        Get.back();
+      });
+    } else {
+      Get.showSnackbar(GetBar(
+        message: 'Save availability field please try again',
+        duration: Duration(seconds: 2),
+      ));
+    }
+  }
+
+  String setWeekIndex(String day) {
+    if (day == 'Sunday') {
+      return '0';
+    } else if (day == 'Monday') {
+      return '1';
+    } else if (day == 'Tuesday') {
+      return '2';
+    } else if (day == 'Wednesday') {
+      return '3';
+    } else if (day == 'Thursday') {
+      return '4';
+    } else if (day == 'Friday') {
+      return '5';
+    } else {
+      return '6';
     }
   }
 }

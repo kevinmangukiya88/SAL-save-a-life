@@ -30,8 +30,6 @@ import 'package:video_player/video_player.dart';
 
 import 'Articledetail.dart';
 
-
-
 Therapist getTherapistData;
 
 class HomeMain extends StatefulWidget {
@@ -42,14 +40,15 @@ class HomeMain extends StatefulWidget {
 }
 
 class _HomeMainState extends State<HomeMain> {
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   Future<void> _launched;
   bool isloading = false;
   var getHomeContent = GetHomePageContentRepo();
   var getHomeContentModal = GetHomeContentModal();
   var upcomintAppointments = UpcomingAppointmentRepo();
   List<Appointment> appointments = new List();
-var first;
-var last;
+  var first;
+  var last;
   var moodstatic = [
     "0:30",
     "1:00",
@@ -100,7 +99,7 @@ var last;
     "23:30"
         "24:00"
   ];
-bool isloding=false;
+  bool isloding = false;
   List<Color> colors = [
     Color.fromRGBO(42, 138, 163, 0.75),
     Color.fromRGBO(48, 37, 33, 0.75),
@@ -121,13 +120,12 @@ bool isloding=false;
   var getprofilemodel = GetTherapistDetailModal();
   var getlistenermodel = GetListenerDetailModal();
   getUserData() async {
-    SharedPreferences prefs= await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    print("sdvvs"+prefs.getString("therapistid"));
+    print("sdvvs" + prefs.getString("therapistid"));
 
     //print("klnll"+last);
     SharedPreferencesTest().saveuserdata("get").then((value) async {
-
       if (value != null && value != "") {
         setState(() {
           Map userupdateddata = json.decode(value);
@@ -138,11 +136,11 @@ bool isloding=false;
   }
 
   getTherapistId() async {
-    SharedPreferences prefs= await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    print("sdvvs"+prefs.getString("therapistid"));
+    print("sdvvs" + prefs.getString("therapistid"));
     setState(() {
-      therapistId=prefs.getString("therapistid");
+      therapistId = prefs.getString("therapistid");
     });
     SharedPreferencesTest().getTherapistId().then((value) async {
       print("val" + value.toString());
@@ -186,9 +184,10 @@ bool isloding=false;
           error.toString(),
           "",
         );
-      }
-      );
-    });}
+      });
+    });
+  }
+
   @override
   void initState() {
     getTherapistname();
@@ -199,7 +198,7 @@ bool isloding=false;
 
     upcomintAppointments
         .upcomingAppointmentRepo(
-     context,
+      context,
     )
         .then((value) {
       if (value != null) {
@@ -243,13 +242,13 @@ bool isloding=false;
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     List<Widget> widgetList = new List<Widget>();
-    var child = SafeArea(child: Scaffold(
+    var child = SafeArea(
+        child: Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -277,15 +276,20 @@ bool isloding=false;
                         elevation: 0.0,
                         actions: [
                           GestureDetector(
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context){
+                            onTap: () {
+                              /* Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
                                 return NotificationsScreen();
-                              }));
+                              }));*/
+                              _scaffoldKey.currentState.openDrawer();
                             },
                             child: Container(
-                              margin:EdgeInsets.only(right: SizeConfig.blockSizeHorizontal * 5),
-                              child: Icon(Icons.notifications_none_sharp,
-                                color: Colors.white,),
+                              margin: EdgeInsets.only(
+                                  right: SizeConfig.blockSizeHorizontal * 5),
+                              child: Icon(
+                                Icons.notifications_none_sharp,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],
@@ -295,43 +299,58 @@ bool isloding=false;
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.symmetric(
                             horizontal: SizeConfig.screenWidth * 0.05,
-                            vertical: SizeConfig.blockSizeVertical
-                        ),
+                            vertical: SizeConfig.blockSizeVertical),
                         child: Text("Hello,",
                             style: GoogleFonts.openSans(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w400,
-                                fontSize: SizeConfig.blockSizeVertical * 3
-                            )),
+                                fontSize: SizeConfig.blockSizeVertical * 3)),
                       ),
                       Container(
                         width: SizeConfig.screenWidth,
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.symmetric(
                             horizontal: SizeConfig.screenWidth * 0.05,
-                            vertical: SizeConfig.blockSizeVertical
-                        ),
+                            vertical: SizeConfig.blockSizeVertical),
                         child: Text(" ${first}",
                             style: GoogleFonts.openSans(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
-                                fontSize: SizeConfig.blockSizeVertical * 3.5
-                            )),
+                                fontSize: SizeConfig.blockSizeVertical * 3.5)),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).pushNamed('/KYC');
+                        },
+                        child: Container(
+                          width: SizeConfig.screenWidth,
+                          height: SizeConfig.blockSizeVertical * 5,
+                          alignment: Alignment.center,
+                          margin: EdgeInsets.symmetric(
+                            horizontal: SizeConfig.screenWidth * 0.05,
+                            vertical: SizeConfig.blockSizeVertical,
+                          ),
+                          decoration: BoxDecoration(
+                              color: Colors.blueAccent,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Text(
+                            "Complete your KYC to Start taking bookings",
+                            style: GoogleFonts.openSans(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Container(
                   width: SizeConfig.screenWidth,
-                  margin: EdgeInsets.only(
-                      top: SizeConfig.screenHeight * 0.25
-                  ),
+                  margin: EdgeInsets.only(top: SizeConfig.screenHeight * 0.30),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(65)
-                      ),
-                      color: Colors.white
-                  ),
+                      borderRadius:
+                          BorderRadius.only(topRight: Radius.circular(65)),
+                      color: Colors.white),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,20 +358,38 @@ bool isloding=false;
                       SizedBox(
                         height: SizeConfig.blockSizeVertical * 3.5,
                       ),
-                      appointments != null && appointments.length > 0  ?  ListView.builder(
-                        shrinkWrap: true,
-                        itemBuilder: (context, index){
-                        return appointments != null && appointments.length > 0 ?  listTileCafe1(context,appointments.elementAt(index).clientId,moodstatic.elementAt(index),(){
-                          setState(() {
-                            _launched = makePhoneCall();
-                          });
-                        }): Container(
-                          child: Center(child: Text("No Upcoming Appointments", style:  TextStyle(color: Colors.black),)),
-                        );
-                      }, itemCount: appointments.length,): Container(
-                        child: Center(child: Text("No Upcoming Appointments", style:  TextStyle(color: Colors.black),)),
-                      ),
-                     /* Container(
+                      appointments != null && appointments.length > 0
+                          ? ListView.builder(
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return appointments != null &&
+                                        appointments.length > 0
+                                    ? listTileCafe1(
+                                        context,
+                                        appointments.elementAt(index).clientId,
+                                        moodstatic.elementAt(index), () {
+                                        setState(() {
+                                          _launched = makePhoneCall();
+                                        });
+                                      })
+                                    : Container(
+                                        child: Center(
+                                            child: Text(
+                                          "No Upcoming Appointments",
+                                          style: TextStyle(color: Colors.black),
+                                        )),
+                                      );
+                              },
+                              itemCount: appointments.length,
+                            )
+                          : Container(
+                              child: Center(
+                                  child: Text(
+                                "No Upcoming Appointments",
+                                style: TextStyle(color: Colors.black),
+                              )),
+                            ),
+                      /* Container(
                         width: SizeConfig.screenWidth,
                         margin: EdgeInsets.symmetric(
                           horizontal: SizeConfig.screenWidth * 0.05,
@@ -385,149 +422,176 @@ bool isloding=false;
                               }),
                             ],
                           )),*/
-                      appointments != null &&  appointments.length > 0 ?   Container(
-                        margin:EdgeInsets.symmetric(
-                            horizontal: SizeConfig.screenWidth * 0.05,vertical: SizeConfig.blockSizeVertical * 2
-                        ),
-                        child: MaterialButton(
-                          onPressed: (){
-                            Navigator.of(context).pushNamed('/Cafe1');
-                          },
-                          minWidth: SizeConfig.screenWidth,
-                          height: SizeConfig.blockSizeVertical * 6,
-                          child: Text("See All",
-                          style: GoogleFonts.openSans(
-                            color: Color(backgroundColorBlue)
-                          ),),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            side: BorderSide(
-                              color: Color(backgroundColorBlue)
-                            ),
-                          ),
-                        ),
-                      ):SizedBox(),
+                      appointments != null && appointments.length > 0
+                          ? Container(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: SizeConfig.screenWidth * 0.05,
+                                  vertical: SizeConfig.blockSizeVertical * 2),
+                              child: MaterialButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed('/Cafe1');
+                                },
+                                minWidth: SizeConfig.screenWidth,
+                                height: SizeConfig.blockSizeVertical * 6,
+                                child: Text(
+                                  "See All",
+                                  style: GoogleFonts.openSans(
+                                      color: Color(backgroundColorBlue)),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  side: BorderSide(
+                                      color: Color(backgroundColorBlue)),
+                                ),
+                              ),
+                            )
+                          : SizedBox(),
                       Container(
                         width: SizeConfig.screenWidth,
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.symmetric(
                             horizontal: SizeConfig.screenWidth * 0.05,
-                            vertical: SizeConfig.blockSizeVertical * 2
-                        ),
-                        child: Text("LEARN",
+                            vertical: SizeConfig.blockSizeVertical * 2),
+                        child: Text(
+                          "LEARN",
                           style: GoogleFonts.openSans(
                               fontWeight: FontWeight.w600,
-                              color: Color(fontColorGray)
-                          ),),
+                              color: Color(fontColorGray)),
+                        ),
                       ),
                       Container(
                         margin: EdgeInsets.symmetric(
                             horizontal: SizeConfig.screenWidth * 0.02,
                             vertical: SizeConfig.blockSizeVertical * 2),
                         child: getHomeContentModal != null &&
-                            getHomeContentModal.articles != null &&
-                            getHomeContentModal.articles.length > 0
+                                getHomeContentModal.articles != null &&
+                                getHomeContentModal.articles.length > 0
                             ? GridView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          primary: false,
-                          gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8),
-                          itemBuilder: (BuildContext context, int index) {
-                            /* if(colors.length < getHomeContentModal.articles.length){
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                primary: false,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 8,
+                                        mainAxisSpacing: 8),
+                                itemBuilder: (BuildContext context, int index) {
+                                  /* if(colors.length < getHomeContentModal.articles.length){
                                     colors.addAll(colors);
                                   }*/
-                            return GestureDetector(
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Article(image:"https://sal-prod.s3.ap-south-1.amazonaws.com/"+getHomeContentModal.articles.elementAt(index).photo,
-                                    title:getHomeContentModal.articles.elementAt(index).title,description:getHomeContentModal.articles.elementAt(index).description)));
-                              },
-                              child: Container(
-                                width: SizeConfig.screenWidth * 0.4,
-                                alignment: Alignment.bottomCenter,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  image: DecorationImage(
-                                    image: getHomeContentModal != null &&
-                                        getHomeContentModal
-                                            .articles.length >
-                                            0 &&
-                                        getHomeContentModal.articles
-                                            .elementAt(index)
-                                            .photo !=
-                                            null &&
-                                        getHomeContentModal.articles
-                                            .elementAt(index)
-                                            .photo !=
-                                            ""
-                                        ? CachedNetworkImageProvider(
-                                        "https://sal-prod.s3.ap-south-1.amazonaws.com/" +
-                                            getHomeContentModal.articles
-                                                .elementAt(index)
-                                                .photo)
-                                        : AssetImage(
-                                      "assets/bg/gridCard1.png",
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => Article(
+                                                  image:
+                                                      "https://sal-prod.s3.ap-south-1.amazonaws.com/" +
+                                                          getHomeContentModal
+                                                              .articles
+                                                              .elementAt(index)
+                                                              .photo,
+                                                  title: getHomeContentModal
+                                                      .articles
+                                                      .elementAt(index)
+                                                      .title,
+                                                  description:
+                                                      getHomeContentModal
+                                                          .articles
+                                                          .elementAt(index)
+                                                          .description)));
+                                    },
+                                    child: Container(
+                                      width: SizeConfig.screenWidth * 0.4,
+                                      alignment: Alignment.bottomCenter,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        image: DecorationImage(
+                                          image: getHomeContentModal != null &&
+                                                  getHomeContentModal
+                                                          .articles.length >
+                                                      0 &&
+                                                  getHomeContentModal.articles
+                                                          .elementAt(index)
+                                                          .photo !=
+                                                      null &&
+                                                  getHomeContentModal.articles
+                                                          .elementAt(index)
+                                                          .photo !=
+                                                      ""
+                                              ? CachedNetworkImageProvider(
+                                                  "https://sal-prod.s3.ap-south-1.amazonaws.com/" +
+                                                      getHomeContentModal
+                                                          .articles
+                                                          .elementAt(index)
+                                                          .photo)
+                                              : AssetImage(
+                                                  "assets/bg/gridCard1.png",
+                                                ),
+                                        ),
+                                      ),
+                                      child: Container(
+                                        width: SizeConfig.screenWidth,
+                                        padding: EdgeInsets.only(
+                                            left: SizeConfig.screenWidth * 0.02,
+                                            right:
+                                                SizeConfig.screenWidth * 0.02),
+                                        height:
+                                            SizeConfig.blockSizeVertical * 8,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: colors[index],
+                                            borderRadius: BorderRadius.only(
+                                                bottomRight:
+                                                    Radius.circular(20),
+                                                bottomLeft:
+                                                    Radius.circular(20))),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              getHomeContentModal != null &&
+                                                      getHomeContentModal
+                                                              .articles.length >
+                                                          0
+                                                  ? getHomeContentModal.articles
+                                                      .elementAt(index)
+                                                      .title
+                                                  : "",
+                                              style: GoogleFonts.openSans(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: SizeConfig
+                                                          .blockSizeVertical *
+                                                      1.5),
+                                            ),
+                                            Text(
+                                              timeAgo(DateTime.parse(
+                                                  getHomeContentModal.articles
+                                                      .elementAt(index)
+                                                      .createdAt)),
+                                              style: GoogleFonts.openSans(
+                                                  color: Colors.white,
+                                                  fontSize: SizeConfig
+                                                          .blockSizeVertical *
+                                                      1.25),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                child: Container(
-                                  width: SizeConfig.screenWidth,
-                                  padding: EdgeInsets.only(
-                                      left: SizeConfig.screenWidth * 0.02,
-                                      right: SizeConfig.screenWidth * 0.02),
-                                  height: SizeConfig.blockSizeVertical * 8,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                      color: colors[index],
-                                      borderRadius: BorderRadius.only(
-                                          bottomRight: Radius.circular(20),
-                                          bottomLeft: Radius.circular(20))),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        getHomeContentModal != null &&
-                                            getHomeContentModal
-                                                .articles.length >
-                                                0
-                                            ? getHomeContentModal.articles
-                                            .elementAt(index)
-                                            .title
-                                            : "",
-                                        style: GoogleFonts.openSans(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,fontSize: SizeConfig.blockSizeVertical  * 1.5),
-                                      ),
-                                      Text(
-                                        timeAgo(DateTime.parse(
-                                            getHomeContentModal.articles
-                                                .elementAt(index)
-                                                .createdAt)),
-                                        style: GoogleFonts.openSans(
-                                            color: Colors.white,
-                                            fontSize: SizeConfig
-                                                .blockSizeVertical *
-                                                1.25),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          itemCount: getHomeContentModal.articles !=
-                              null &&
-                              getHomeContentModal.articles.length > 0
-                              ? getHomeContentModal.articles.length
-                              : 0,
-                        )
+                                  );
+                                },
+                                itemCount: getHomeContentModal.articles !=
+                                            null &&
+                                        getHomeContentModal.articles.length > 0
+                                    ? getHomeContentModal.articles.length
+                                    : 0,
+                              )
                             : Container(
-                          child: Center(child: Text("No content found")),
-                        ),
+                                child: Center(child: Text("No content found")),
+                              ),
                       )
                     ],
                   ),
@@ -538,8 +602,9 @@ bool isloding=false;
         ),
       ),
       drawer: DrawerMenu(),
-      bottomNavigationBar: NavigationBar(index: 0,),
-
+      bottomNavigationBar: NavigationBar(
+        index: 0,
+      ),
     ));
 
     widgetList.add(child);
@@ -561,19 +626,16 @@ bool isloding=false;
     }
 
     return Stack(children: widgetList);
-
   }
 
-
-
   getTherapistname() async {
-    SharedPreferences prefs= await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    print("sdvvs"+prefs.getString("therapistid"));
+    print("sdvvs" + prefs.getString("therapistid"));
     setState(() {
-      therapistId=prefs.getString("therapistid");
+      therapistId = prefs.getString("therapistid");
     });
-    if(prefs.getString("type")=="Therapist"){
+    if (prefs.getString("type") == "Therapist") {
       getprofilecontent
           .getTherapistDetail(
         context: context,
@@ -583,18 +645,15 @@ bool isloding=false;
         if (value != null) {
           print(value.meta.status);
           if (value.meta.status == "200") {
-            setState(()  {
+            setState(() {
               isloding = false;
               print(value.meta.messageType);
-                getprofilemodel = value;
-                print(getprofilemodel.accessToken);
-                first=getprofilemodel.therapist.firstName;
-                last=getprofilemodel.therapist.lastName;
-                print(getprofilemodel.therapist.firstName);
-                print(getprofilemodel.therapist.email);
-
-
-
+              getprofilemodel = value;
+              print(getprofilemodel.accessToken);
+              first = getprofilemodel.therapist.firstName;
+              last = getprofilemodel.therapist.lastName;
+              print(getprofilemodel.therapist.firstName);
+              print(getprofilemodel.therapist.email);
             });
           } else {
             setState(() {
@@ -626,8 +685,7 @@ bool isloding=false;
           "",
         );
       });
-    }
-    else{
+    } else {
       getlistenercontent
           .getTherapistDetail(
         context: context,
@@ -637,19 +695,17 @@ bool isloding=false;
         if (value != null) {
           print(value.meta.status);
           if (value.meta.status == "200") {
-            setState(()  {
+            setState(() {
               isloding = false;
               print(value.meta.messageType);
               //SharedPreferences prefs= await SharedPreferences.getInstance();
 
               getlistenermodel = value;
               print(getlistenermodel.accessToken);
-              first=getlistenermodel.listener.firstName;
-              last=getlistenermodel.listener.lastName;
+              first = getlistenermodel.listener.firstName;
+              last = getlistenermodel.listener.lastName;
               print(getlistenermodel.listener.firstName);
               print(getlistenermodel.listener.email);
-
-
             });
           } else {
             setState(() {
@@ -682,8 +738,5 @@ bool isloding=false;
         );
       });
     }
-
   }
 }
-
-

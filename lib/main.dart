@@ -39,6 +39,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'UI/CancelAppointment.dart';
 import 'UI/LoginScreen.dart';
 import 'Utils/SharedPref.dart';
+import 'controller/availability_controller.dart';
 
 Therapist getTherapistData;
 
@@ -104,7 +105,6 @@ class _MentalHealthState extends State<MentalHealth> {
           '/Help': (context) => Help(),
           '/Settings': (context) => Settings(),
           '/AvailabilityFirst': (context) => AvailabilityFirst(),
-          // '/AvailabilityFirst': (context) => Demo(),
           '/CafeEvents': (context) => CafeEvents(),
           '/CafeEventsDetails': (context) => CafeEventsDetails(),
           '/AddNewEvent': (context) => AddNewEvent(),

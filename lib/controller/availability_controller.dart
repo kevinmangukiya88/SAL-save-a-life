@@ -57,12 +57,15 @@ class ShowTimesController extends GetxController {
 
   RxList get radioStatusList => _radioStatusList;
 
-  void setRadioStatusList(String value) {
-    if (_radioStatusList.contains(value)) {
-      _radioStatusList.remove(value);
-    } else {
-      _radioStatusList.add(value);
-    }
+  void setRadioStatusList({String value, int index}) {
+    getAvailabilityData.value.availability[index]['availability_status'] =
+        value;
+
+    // if (_radioStatusList.contains(value)) {
+    //   _radioStatusList.remove(value);
+    // } else {
+    //   _radioStatusList.add(value);
+    // }
     update();
   }
 
@@ -71,6 +74,7 @@ class ShowTimesController extends GetxController {
   RxList get deleteStatusList => _deleteStatusList;
 
   void setDeleteStatusMap(String value) {
+    // getAvailabilityData.value.availability[index]['status'] = value;
     if (_deleteStatusList.contains(value)) {
       _deleteStatusList.remove(value);
     } else {

@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:mental_health/Utils/Colors.dart';
 import 'package:mental_health/controller/availability_controller.dart';
 import 'package:mental_health/models/availabilityModel.dart';
+import 'package:mental_health/models/avalabilitymodel.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'AvailabilityFirst.dart';
@@ -18,7 +20,6 @@ class Availability extends StatefulWidget {
 }
 
 class _AvailabilityState extends State<Availability> {
-  List<String> selectedDays = <String>[];
   DateTime selectedTimeFrom;
   DateTime selectedTimeTo;
   ShowTimesController _controller = Get.find();
@@ -30,6 +31,63 @@ class _AvailabilityState extends State<Availability> {
     _controller.clearDeleteStatus();
     _controller.clearRadioStatus();
     _controller.getAvailability();
+  }
+
+  String setData(Map<String, dynamic> d, List<Map<String, dynamic>> allData) {
+    String firstDate;
+    String lastDate;
+    int length =
+        allData.where((element) => element['status'] == '1').toList().length;
+    Map<int, int> data = {};
+    for (int index = 0; index < length; index++) {
+      for (var i = 0; i < 48; i++) {
+        if (d.keys.toList().contains('$i')) {
+          data.addAll({i: int.parse(d.values.toList()[i])});
+        }
+      }
+    }
+    for (var i = 0; i < 48; i++) {
+      if (data[i] == 1) {
+        int value = data.keys.toList()[i];
+        if (value % 2 == 0) {
+          firstDate = '${(value / 2).ceil()}:00';
+        } else {
+          firstDate = '${(value / 2).ceil()}:30';
+        }
+        break;
+      }
+    }
+    for (var i = 47; i > 0; i--) {
+      if (data[i] == 1) {
+        int value = data.keys.toList()[i];
+        print('nn${value % 2}');
+        if (value % 2 == 0) {
+          lastDate = '${(value / 2).ceil()}:00';
+        } else {
+          lastDate = '${(value / 2).ceil()}:30';
+        }
+        break;
+      }
+    }
+    return '$firstDate-$lastDate PM';
+  }
+
+  String setWeekDay(String day) {
+    if (day == '0') {
+      return 'Sunday';
+    } else if (day == '1') {
+      return 'Monday';
+    } else if (day == '2') {
+      return 'Tuesday';
+    } else if (day == '3') {
+      return 'Wednesday';
+    } else if (day == '4') {
+      return 'Thursday';
+    } else if (day == '5') {
+      return 'Friday';
+    } else {
+      return 'Saturday';
+    }
   }
 
   @override
@@ -64,33 +122,70 @@ class _AvailabilityState extends State<Availability> {
               if (controller.getAvailabilityData.value.availability.isEmpty) {
                 return Center(child: Text('Data not found'));
               }
+              AvailabiltiyModel response = controller.getAvailabilityData.value;
 
-              return ListView(
-                children: selectedDays
-                    .toList()
-                    .map((e) => ListTile(
-                          title: Text(
-                              '${DateFormat.jm().format(selectedTimeFrom)} - ${DateFormat.jm().format(selectedTimeTo)}'),
-                          trailing: controller.isDeleteStatus.value
-                              ? Checkbox(
-                                  value: controller.deleteStatusList.isEmpty
-                                      ? false
-                                      : controller.deleteStatusList.contains(e),
-                                  onChanged: (value) {
-                                    _controller.setDeleteStatusMap(e);
-                                  },
-                                )
-                              : CupertinoSwitch(
-                                  value: controller.radioStatusList.isEmpty
-                                      ? false
-                                      : controller.radioStatusList.contains(e),
-                                  onChanged: (value) {
-                                    _controller.setRadioStatusList(e);
-                                  },
+              return Stack(
+                children: [
+                  ListView(
+                    children: response.availability
+                        .map((e) => e['status'] == '0'
+                            ? SizedBox()
+                            : ListTile(
+                                title: Text(
+                                    '${setData(e, response.availability)}'
+                                    // '${DateFormat.jm().format(selectedTimeFrom)} - ${DateFormat.jm().format(selectedTimeTo)}'
+                                    ),
+                                trailing: controller.isDeleteStatus.value
+                                    ? Checkbox(
+                                        value:
+                                            controller.deleteStatusList.isEmpty
+                                                ? false
+                                                : controller.deleteStatusList
+                                                    .contains(e['id']),
+                                        onChanged: (value) {
+                                          _controller
+                                              .setDeleteStatusMap(e['id']);
+                                        },
+                                      )
+                                    : CupertinoSwitch(
+                                        value: e['availability_status'] == '1'
+                                            ? true
+                                            : false,
+                                        onChanged: (value) {
+                                          _controller.setRadioStatusList(
+                                              value: value ? '1' : '0',
+                                              index: response.availability
+                                                  .indexOf(e));
+                                          changeSwitchStatus([e]);
+                                        },
+                                      ),
+                                subtitle: Row(
+                                  children: [
+                                    Text(setWeekDay(e['weekday'])),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Text(
+                                      'Break Time : ' +
+                                          (e['break'] == "0"
+                                              ? '00 Min'
+                                              : "30 Min"),
+                                      style: TextStyle(color: cadetBlue),
+                                    ),
+                                  ],
                                 ),
-                          subtitle: Text(e.toUpperCase()),
-                        ))
-                    .toList(),
+                              ))
+                        .toList(),
+                  ),
+                  controller.addAvailabilityApiResponse.value == Status.LOADING
+                      ? Container(
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          color: Colors.black38,
+                        )
+                      : SizedBox()
+                ],
               );
             },
           ),
@@ -126,25 +221,33 @@ class _AvailabilityState extends State<Availability> {
 
   Widget deleteTextBtn(ShowTimesController controller) {
     return TextButton(
-      onPressed: () {
-        // List<DateTime> deleteDates = [];
-        // for (DateTime date in selectedDates) {
-        //   if (controller.deleteStatusList.value
-        //       .contains(DateFormat('EEEE').format(date))) {
-        //     deleteDates.add(date);
-        //   }
-        // }
-        for (String value in controller.deleteStatusList.value) {
-          selectedDays.remove(value);
+      onPressed: () async {
+        print('DELETE:${controller.deleteStatusList.value}');
+        var requestList = controller.getAvailabilityData.value.availability
+            .where((element) =>
+                controller.deleteStatusList.value.contains(element['id']))
+            .toList();
+        requestList.forEach((element) {
+          element['status'] = '0';
+        });
+        print('DATA:$requestList');
+
+        await _controller.addAvailability(requestList);
+        if (_controller.addAvailabilityApiResponse.value == Status.COMPLETE) {
+          Get.showSnackbar(GetBar(
+            message: 'Availability Delete Successfully',
+            duration: Duration(seconds: 2),
+          ));
+          Future.delayed(Duration(seconds: 3), () {
+            _controller.clearDeleteStatus();
+            _controller.setIsDeleteStatus(false);
+          });
+        } else {
+          Get.showSnackbar(GetBar(
+            message: 'Delete availability failed please try again',
+            duration: Duration(seconds: 2),
+          ));
         }
-
-        // selectedDates = selectedDates
-        //     .where((element) => !deleteDates.contains(element))
-        //     .toList();
-
-        _controller.clearDeleteStatus();
-
-        _controller.setIsDeleteStatus(false);
       },
       child: Text(
         "Delete",
@@ -152,6 +255,25 @@ class _AvailabilityState extends State<Availability> {
             color: Color(backgroundColorBlue), fontWeight: FontWeight.w600),
       ),
     );
+  }
+
+  Future<void> changeSwitchStatus(List<Map<String, dynamic>> req) async {
+    await _controller.addAvailability(req);
+    if (_controller.addAvailabilityApiResponse.value == Status.COMPLETE) {
+      Get.showSnackbar(GetBar(
+        message: 'Availability Status Updated Successfully',
+        duration: Duration(seconds: 2),
+      ));
+      Future.delayed(Duration(seconds: 3), () {
+        _controller.clearDeleteStatus();
+        _controller.setIsDeleteStatus(false);
+      });
+    } else {
+      Get.showSnackbar(GetBar(
+        message: 'Status Updated availability failed please try again',
+        duration: Duration(seconds: 2),
+      ));
+    }
   }
 
   IconButton deleteIcon() {

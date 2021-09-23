@@ -384,7 +384,10 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
       }
       mapData.addAll({'weekday': setWeekIndex(day)});
       mapData.addAll({'counsellor_id': id});
-      // mapData.addAll({'availability_status': 'false'});
+      mapData.addAll({'availability_status': 'false'});
+      mapData.addAll({'status': '1'});
+      mapData.addAll({'break': breakTime.value ? '1' : '0'});
+
       requestList.add(mapData);
     }
     log('request:$requestList');
@@ -400,7 +403,7 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
       });
     } else {
       Get.showSnackbar(GetBar(
-        message: 'Save availability field please try again',
+        message: 'Save availability failed please try again',
         duration: Duration(seconds: 2),
       ));
     }

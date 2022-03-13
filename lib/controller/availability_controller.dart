@@ -10,8 +10,6 @@ class ShowTimesController extends GetxController {
   Rx<Status> getAvailabilityApiResponse = Status.INITIAL.obs;
   Rx<AvailabiltiyModel> getAvailabilityData = AvailabiltiyModel().obs;
   Rx<Status> addAvailabilityApiResponse = Status.INITIAL.obs;
-  Rx<AddAvailabilityResponseModel> addAvailabilityData =
-      AddAvailabilityResponseModel().obs;
 
   Future<AvailabiltiyModel> getAvailability() async {
     getAvailabilityApiResponse = Status.LOADING.obs;
@@ -34,9 +32,8 @@ class ShowTimesController extends GetxController {
     try {
       AddAvailabilityResponseModel response =
           await AddAvailabilityRepo.addAvailability(body);
+      await getAvailability();
       addAvailabilityApiResponse = Status.COMPLETE.obs;
-      addAvailabilityData = response.obs;
-      getAvailability();
     } catch (e) {
       print('addAvailabilityApiResponse Error :$e');
       addAvailabilityApiResponse = Status.ERROR.obs;
@@ -60,12 +57,6 @@ class ShowTimesController extends GetxController {
   void setRadioStatusList({String value, int index}) {
     getAvailabilityData.value.availability[index]['availability_status'] =
         value;
-
-    // if (_radioStatusList.contains(value)) {
-    //   _radioStatusList.remove(value);
-    // } else {
-    //   _radioStatusList.add(value);
-    // }
     update();
   }
 
@@ -74,7 +65,6 @@ class ShowTimesController extends GetxController {
   RxList get deleteStatusList => _deleteStatusList;
 
   void setDeleteStatusMap(String value) {
-    // getAvailabilityData.value.availability[index]['status'] = value;
     if (_deleteStatusList.contains(value)) {
       _deleteStatusList.remove(value);
     } else {

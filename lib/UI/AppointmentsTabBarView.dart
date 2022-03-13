@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mental_health/UI/upcomingAppointments.dart';
 import 'package:mental_health/Utils/Colors.dart';
+import 'package:mental_health/Utils/NavigationBar.dart';
 import 'PastAppointments.dart';
-
-
 
 class AppointmentTabBarView extends StatefulWidget {
   const AppointmentTabBarView({Key key}) : super(key: key);
@@ -12,7 +11,8 @@ class AppointmentTabBarView extends StatefulWidget {
   _AppointmentTabBarViewState createState() => _AppointmentTabBarViewState();
 }
 
-class _AppointmentTabBarViewState extends State<AppointmentTabBarView> with SingleTickerProviderStateMixin {
+class _AppointmentTabBarViewState extends State<AppointmentTabBarView>
+    with SingleTickerProviderStateMixin {
   TabController _controller;
   int _selectedIndex = 0;
   @override
@@ -26,20 +26,43 @@ class _AppointmentTabBarViewState extends State<AppointmentTabBarView> with Sing
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(backgroundColorBlue),
-          bottom: TabBar(
-            controller: _controller,
-            onTap: (v){
-              _selectedIndex = v;
-            },
-            isScrollable: false,
-            tabs: [
-              Tab(child: Text("UPCOMING"),),
-              Tab(icon: Text("PAST"),),
-            ],
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(70),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            bottom: TabBar(
+              controller: _controller,
+              onTap: (v) {
+                _selectedIndex = v;
+              },
+              isScrollable: false,
+              indicatorWeight: 3,
+              unselectedLabelColor: Colors.grey,
+              labelColor: Color(backgroundColorBlue),
+              indicatorColor: Color(backgroundColorBlue),
+              labelStyle: TextStyle(
+                  fontWeight: FontWeight.w700, fontFamily: 'OpenSans'),
+              unselectedLabelStyle: TextStyle(
+                  fontWeight: FontWeight.w700, fontFamily: 'OpenSans'),
+              tabs: [
+                Tab(
+                  child: Text(
+                    "UPCOMING",
+                  ),
+                ),
+                Tab(
+                  icon: Text("PAST"),
+                ),
+              ],
+            ),
+            // title: Text(
+            //   'Appointments',
+            //   style: TextStyle(color: Color(backgroundColorBlue)),
+            // ),
           ),
-          title: Text('Appointments'),
+        ),
+        bottomNavigationBar: NavigationBar(
+          index: 1,
         ),
         body: TabBarView(
           controller: _controller,

@@ -42,17 +42,24 @@ class _AvailabilityState extends State<Availability> {
     for (int index = 0; index < length; index++) {
       for (var i = 0; i < 48; i++) {
         if (d.keys.toList().contains('$i')) {
-          data.addAll({i: int.parse(d.values.toList()[i])});
+          data.addAll(
+              {i: int.parse(d.values.toList()[d.keys.toList().indexOf('$i')])});
         }
       }
     }
+    print('D:$data');
     for (var i = 0; i < 48; i++) {
       if (data[i] == 1) {
         int value = data.keys.toList()[i];
         if (value % 2 == 0) {
           firstDate = '${(value / 2).ceil()}:00';
         } else {
-          firstDate = '${(value / 2).ceil()}:30';
+          firstDate = '${(value / 2).ceil() - 1}:30';
+        }
+        if (value > 24) {
+          firstDate = firstDate + ' PM';
+        } else {
+          firstDate = firstDate + ' AM';
         }
         break;
       }
@@ -60,16 +67,20 @@ class _AvailabilityState extends State<Availability> {
     for (var i = 47; i > 0; i--) {
       if (data[i] == 1) {
         int value = data.keys.toList()[i];
-        print('nn${value % 2}');
         if (value % 2 == 0) {
           lastDate = '${(value / 2).ceil()}:00';
         } else {
-          lastDate = '${(value / 2).ceil()}:30';
+          lastDate = '${(value / 2).ceil() - 1}:30';
+        }
+        if (value > 24) {
+          lastDate = lastDate + ' PM';
+        } else {
+          lastDate = lastDate + ' AM';
         }
         break;
       }
     }
-    return '$firstDate-$lastDate PM';
+    return '$firstDate - $lastDate';
   }
 
   String setWeekDay(String day) {
@@ -100,94 +111,124 @@ class _AvailabilityState extends State<Availability> {
           backgroundColor: Color(backgroundColorBlue),
           child: Icon(Icons.add),
           onPressed: () async {
-            Get.to(AvailabilityFirst());
+            List<Map<String, String>> response = [];
+            if (_controller.getAvailabilityApiResponse.value ==
+                Status.COMPLETE) {
+              response = _controller.getAvailabilityData.value.availability
+                  .where((element) => element['status'] == '1')
+                  .toList();
+            }
+            Get.to(AvailabilityFirst(
+              response: response,
+            ));
           },
         ),
-        body: GestureDetector(
-          onTap: () {
-            _controller.setIsDeleteStatus(false);
-          },
-          child: GetBuilder<ShowTimesController>(
-            builder: (controller) {
-              if (controller.getAvailabilityApiResponse.value ==
-                  Status.LOADING) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              if (controller.getAvailabilityApiResponse.value == Status.ERROR) {
-                return Center(child: Text('Data not found'));
-              }
+        body: SizedBox(
+          height: Get.height,
+          width: Get.width,
+          child: GestureDetector(
+            onTap: () {
+              _controller.setIsDeleteStatus(false);
+            },
+            child: GetBuilder<ShowTimesController>(
+              builder: (controller) {
+                if (controller.getAvailabilityApiResponse.value ==
+                    Status.LOADING) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (controller.getAvailabilityApiResponse.value ==
+                    Status.ERROR) {
+                  return Center(child: Text('Data not found'));
+                }
 
-              if (controller.getAvailabilityData.value.availability.isEmpty) {
-                return Center(child: Text('Data not found'));
-              }
-              AvailabiltiyModel response = controller.getAvailabilityData.value;
-
-              return Stack(
-                children: [
-                  ListView(
-                    children: response.availability
-                        .map((e) => e['status'] == '0'
-                            ? SizedBox()
-                            : ListTile(
-                                title: Text(
-                                    '${setData(e, response.availability)}'
-                                    // '${DateFormat.jm().format(selectedTimeFrom)} - ${DateFormat.jm().format(selectedTimeTo)}'
+                if (controller.getAvailabilityData.value.availability.isEmpty) {
+                  return Center(child: Text('Data not found'));
+                }
+                AvailabiltiyModel response =
+                    controller.getAvailabilityData.value;
+                log('STATUS...:${response.availability}');
+                return Stack(
+                  children: [
+                    Container(
+                      color: Colors.white,
+                      height: Get.height,
+                      width: Get.width,
+                      child: ListView(
+                        children: response.availability
+                            .map((e) => e['status'] == '0'
+                                ? SizedBox()
+                                : ListTile(
+                                    title: Text(
+                                      '${e['format']}',
+                                      // '${setData(e, response.availability)}'
+                                      // '${DateFormat.jm().format(selectedTimeFrom)} - ${DateFormat.jm().format(selectedTimeTo)}'
                                     ),
-                                trailing: controller.isDeleteStatus.value
-                                    ? Checkbox(
-                                        value:
-                                            controller.deleteStatusList.isEmpty
+                                    trailing: controller.isDeleteStatus.value
+                                        ? Checkbox(
+                                            value: controller
+                                                    .deleteStatusList.isEmpty
                                                 ? false
                                                 : controller.deleteStatusList
                                                     .contains(e['id']),
-                                        onChanged: (value) {
-                                          _controller
-                                              .setDeleteStatusMap(e['id']);
-                                        },
-                                      )
-                                    : CupertinoSwitch(
-                                        value: e['availability_status'] == '1'
-                                            ? true
-                                            : false,
-                                        onChanged: (value) {
-                                          _controller.setRadioStatusList(
-                                              value: value ? '1' : '0',
-                                              index: response.availability
-                                                  .indexOf(e));
-                                          changeSwitchStatus([e]);
-                                        },
-                                      ),
-                                subtitle: Row(
-                                  children: [
-                                    Text(setWeekDay(e['weekday'])),
-                                    SizedBox(
-                                      width: 20,
+                                            onChanged: (value) {
+                                              _controller
+                                                  .setDeleteStatusMap(e['id']);
+                                            },
+                                          )
+                                        : CupertinoSwitch(
+                                            value:
+                                                e['availability_status'] == "1"
+                                                    ? true
+                                                    : false,
+                                            activeColor:
+                                                Color(backgroundColorBlue),
+                                            onChanged: (value) {
+                                              _controller.setRadioStatusList(
+                                                  value: value ? '1' : '0',
+                                                  index: response.availability
+                                                      .indexOf(e));
+                                              changeSwitchStatus([e]);
+                                            },
+                                          ),
+                                    subtitle: Row(
+                                      children: [
+                                        Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                                "${setWeekDay(e['weekday'])}")),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Expanded(
+                                          flex: 5,
+                                          child: Text(
+                                            "${'Break Time : ' + (e['break'] == "0" ? '00 Min' : "30 Min")}",
+                                            style: TextStyle(color: cadetBlue),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      'Break Time : ' +
-                                          (e['break'] == "0"
-                                              ? '00 Min'
-                                              : "30 Min"),
-                                      style: TextStyle(color: cadetBlue),
-                                    ),
-                                  ],
-                                ),
-                              ))
-                        .toList(),
-                  ),
-                  controller.addAvailabilityApiResponse.value == Status.LOADING
-                      ? Container(
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          color: Colors.black38,
-                        )
-                      : SizedBox()
-                ],
-              );
-            },
+                                  ))
+                            .toList(),
+                      ),
+                    ),
+                    // controller.addAvailabilityApiResponse.value ==
+                    //         Status.LOADING
+                    //     ? Container(
+                    //         height: Get.height,
+                    //         width: Get.width,
+                    //         child: Center(
+                    //           child: CircularProgressIndicator(),
+                    //         ),
+                    //         color: Colors.black38,
+                    //       )
+                    //     : SizedBox()
+                  ],
+                );
+              },
+            ),
           ),
         ));
   }
@@ -212,20 +253,23 @@ class _AvailabilityState extends State<Availability> {
           builder: (controller) {
             return !controller.isDeleteStatus.value
                 ? deleteIcon()
-                : deleteTextBtn(controller);
+                : deleteTextBtn();
           },
         )
       ],
     );
   }
 
-  Widget deleteTextBtn(ShowTimesController controller) {
+  Widget deleteTextBtn() {
     return TextButton(
       onPressed: () async {
-        print('DELETE:${controller.deleteStatusList.value}');
-        var requestList = controller.getAvailabilityData.value.availability
+        print('DELETE:${_controller.deleteStatusList.value}');
+        if (_controller.deleteStatusList.value.isEmpty) {
+          return;
+        }
+        var requestList = _controller.getAvailabilityData.value.availability
             .where((element) =>
-                controller.deleteStatusList.value.contains(element['id']))
+                _controller.deleteStatusList.value.contains(element['id']))
             .toList();
         requestList.forEach((element) {
           element['status'] = '0';
@@ -234,15 +278,18 @@ class _AvailabilityState extends State<Availability> {
 
         await _controller.addAvailability(requestList);
         if (_controller.addAvailabilityApiResponse.value == Status.COMPLETE) {
-          Get.showSnackbar(GetBar(
-            message: 'Availability Delete Successfully',
-            duration: Duration(seconds: 2),
-          ));
+          // Get.showSnackbar(GetBar(
+          //   message: 'Availability Delete Successfully',
+          //   duration: Duration(seconds: 2),
+          // ));
           Future.delayed(Duration(seconds: 3), () {
             _controller.clearDeleteStatus();
             _controller.setIsDeleteStatus(false);
           });
         } else {
+          requestList.forEach((element) {
+            element['status'] = '1';
+          });
           Get.showSnackbar(GetBar(
             message: 'Delete availability failed please try again',
             duration: Duration(seconds: 2),

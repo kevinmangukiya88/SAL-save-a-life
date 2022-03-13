@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mental_health/UI/Home2.dart';
 import 'package:mental_health/UI/NotificationScreen.dart';
@@ -260,7 +261,7 @@ class _HomeMainState extends State<HomeMain> {
               children: [
                 Container(
                   width: SizeConfig.screenWidth,
-                  height: SizeConfig.screenHeight * 0.4,
+                  height: SizeConfig.screenHeight * 0.5,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.fitWidth,
@@ -277,11 +278,7 @@ class _HomeMainState extends State<HomeMain> {
                         actions: [
                           GestureDetector(
                             onTap: () {
-                              /* Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return NotificationsScreen();
-                              }));*/
-                              _scaffoldKey.currentState.openDrawer();
+                              Get.to(NotificationsScreen());
                             },
                             child: Container(
                               margin: EdgeInsets.only(
@@ -318,35 +315,35 @@ class _HomeMainState extends State<HomeMain> {
                                 fontWeight: FontWeight.w600,
                                 fontSize: SizeConfig.blockSizeVertical * 3.5)),
                       ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).pushNamed('/KYC');
-                        },
-                        child: Container(
-                          width: SizeConfig.screenWidth,
-                          height: SizeConfig.blockSizeVertical * 5,
-                          alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                            horizontal: SizeConfig.screenWidth * 0.05,
-                            vertical: SizeConfig.blockSizeVertical,
-                          ),
-                          decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Text(
-                            "Complete your KYC to Start taking bookings",
-                            style: GoogleFonts.openSans(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ),
+                      // InkWell(
+                      //   onTap: () {
+                      //     Navigator.of(context).pushNamed('/KYC');
+                      //   },
+                      //   child: Container(
+                      //     width: SizeConfig.screenWidth,
+                      //     height: SizeConfig.blockSizeVertical * 5,
+                      //     alignment: Alignment.center,
+                      //     margin: EdgeInsets.symmetric(
+                      //       horizontal: SizeConfig.screenWidth * 0.05,
+                      //       vertical: SizeConfig.blockSizeVertical,
+                      //     ),
+                      //     decoration: BoxDecoration(
+                      //         color: Colors.blueAccent,
+                      //         borderRadius: BorderRadius.circular(10)),
+                      //     child: Text(
+                      //       "Complete your KYC to Start taking bookings",
+                      //       style: GoogleFonts.openSans(
+                      //           color: Colors.white,
+                      //           fontWeight: FontWeight.w600),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
                 Container(
                   width: SizeConfig.screenWidth,
-                  margin: EdgeInsets.only(top: SizeConfig.screenHeight * 0.30),
+                  margin: EdgeInsets.only(top: SizeConfig.screenHeight * 0.25),
                   decoration: BoxDecoration(
                       borderRadius:
                           BorderRadius.only(topRight: Radius.circular(65)),
@@ -550,21 +547,26 @@ class _HomeMainState extends State<HomeMain> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              getHomeContentModal != null &&
-                                                      getHomeContentModal
-                                                              .articles.length >
-                                                          0
-                                                  ? getHomeContentModal.articles
-                                                      .elementAt(index)
-                                                      .title
-                                                  : "",
-                                              style: GoogleFonts.openSans(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: SizeConfig
-                                                          .blockSizeVertical *
-                                                      1.5),
+                                            Flexible(
+                                              child: Text(
+                                                getHomeContentModal != null &&
+                                                        getHomeContentModal
+                                                                .articles
+                                                                .length >
+                                                            0
+                                                    ? getHomeContentModal
+                                                        .articles
+                                                        .elementAt(index)
+                                                        .title
+                                                    : "",
+                                                maxLines: 2,
+                                                style: GoogleFonts.openSans(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: SizeConfig
+                                                            .blockSizeVertical *
+                                                        2),
+                                              ),
                                             ),
                                             Text(
                                               timeAgo(DateTime.parse(
@@ -575,7 +577,7 @@ class _HomeMainState extends State<HomeMain> {
                                                   color: Colors.white,
                                                   fontSize: SizeConfig
                                                           .blockSizeVertical *
-                                                      1.25),
+                                                      1.7),
                                             ),
                                           ],
                                         ),

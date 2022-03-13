@@ -15,7 +15,7 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  var notification  = NotificationRepo();
+  var notification = NotificationRepo();
   List<Notifications> getPaymentsModal = new List();
   bool isloading = true;
 
@@ -25,7 +25,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     isloading = true;
     notification
         .notificationRepo(
-     context,
+      context,
     )
         .then((value) {
       if (value != null) {
@@ -47,7 +47,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       } else {
         setState(() {
           isloading = false;
-
         });
         showAlertDialog(
           context,
@@ -66,27 +65,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       );
     });
   }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> widgetList = new List<Widget>();
-    var child = SafeArea(child: Scaffold(
+    var child = SafeArea(
+        child: Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.0,
         leading: InkWell(
-          onTap: (){
+          onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back_ios_rounded,color: Color(midnightBlue),),
+          child: Icon(
+            Icons.arrow_back_ios_rounded,
+            color: Color(midnightBlue),
+          ),
         ),
         centerTitle: true,
-        title: Text("Notifications",
+        title: Text(
+          "Notifications",
           style: TextStyle(
-              color: Color(midnightBlue),
-              fontWeight: FontWeight.w600
-          ),),
-
+              color: Color(midnightBlue), fontWeight: FontWeight.w600),
+        ),
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -100,39 +103,62 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 vertical: SizeConfig.blockSizeVertical,
                 horizontal: SizeConfig.screenWidth * 0.02,
               ),
-              child: ListView.builder(itemBuilder: (BuildContext context, int index){
-                return Container(
-                  margin: EdgeInsets.only(
-                       top: SizeConfig.blockSizeVertical*2
-                  ),
-                  child: ListTile(
-                    tileColor: Color(whiteColor),
-                    title: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(DateFormat("yMMMMd").format(DateTime.parse(getPaymentsModal.elementAt(index).createdAt)),style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                            fontSize: SizeConfig.blockSizeVertical * 1.75
-                        ),),
-                        Container(
-                          margin: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 2),
-                          child:  Text(getPaymentsModal.elementAt(index).body,style: TextStyle(
-                              color: Color(fontColorGray),
-                              fontSize: SizeConfig.blockSizeVertical * 1.85
-                          ),),
-                        )
-                      ],
+              child: ListView.builder(
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    margin:
+                        EdgeInsets.only(top: SizeConfig.blockSizeVertical * 2),
+                    child: ListTile(
+                      tileColor: Color(whiteColor),
+                      title: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DateFormat("yMMMMd").format(DateTime.parse(
+                                getPaymentsModal.elementAt(index).createdAt)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                                fontSize: SizeConfig.blockSizeVertical * 1.75),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: SizeConfig.blockSizeVertical * 2),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Color(0xffE0EDF6),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    getPaymentsModal.elementAt(index).body,
+                                    style: TextStyle(
+                                        color: Color(fontColorGray),
+                                        fontSize: SizeConfig.blockSizeVertical *
+                                            1.85),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-
-                  ),
-                );
-              },
+                  );
+                },
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount:getPaymentsModal != null && getPaymentsModal.length > 0 ?  getPaymentsModal.length: 0,
-                primary: false,),
+                itemCount:
+                    getPaymentsModal != null && getPaymentsModal.length > 0
+                        ? getPaymentsModal.length
+                        : 0,
+                primary: false,
+              ),
             ),
           ],
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mental_health/Utils/Colors.dart';
+import 'package:mental_health/Utils/SizeConfig.dart';
 
 import 'AssesmentQuiz.dart';
 
@@ -9,7 +11,7 @@ class Assesmentcreate extends StatefulWidget {
 }
 
 class _AssesmentcreateState extends State<Assesmentcreate> {
-
+  String selectedGender = 'Male';
 
   @override
   Widget build(BuildContext context) {
@@ -48,19 +50,27 @@ class _AssesmentcreateState extends State<Assesmentcreate> {
             SizedBox(
               height: 5,
             ),
-            Container(
+            TextFormField(
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  hintText: 'Enter Event Name'),
+            ),
+            /*Container(
               child: TextField(
                 decoration: InputDecoration(
                   fillColor: Colors.white,
                   filled: true,
-                  isDense: true,
                   focusColor: Color(fontColorGray),
                   hoverColor: Color(fontColorGray),
                   hintStyle: TextStyle(
                     color: Color(midnightBlue),
                   ),
                   hintText: "Enter Event Name",
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  // floatingLabelBehavior: FloatingLabelBehavior.always,
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 42, vertical: 10),
                   enabledBorder: OutlineInputBorder(
@@ -80,7 +90,7 @@ class _AssesmentcreateState extends State<Assesmentcreate> {
                   ),
                 ),
               ),
-            ),
+            ),*/
             SizedBox(
               height: 15,
             ),
@@ -91,7 +101,17 @@ class _AssesmentcreateState extends State<Assesmentcreate> {
             SizedBox(
               height: 5,
             ),
-            Container(
+            TextFormField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                hintText: "Enter Age",
+              ),
+            ),
+            /* Container(
               child: TextField(
                 decoration: InputDecoration(
                   fillColor: Colors.white,
@@ -123,7 +143,7 @@ class _AssesmentcreateState extends State<Assesmentcreate> {
                   ),
                 ),
               ),
-            ),
+            ),*/
             SizedBox(
               height: 15,
             ),
@@ -134,7 +154,30 @@ class _AssesmentcreateState extends State<Assesmentcreate> {
             SizedBox(
               height: 5,
             ),
-            Container(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: ['Male', 'FeMale', 'Other']
+                  .map((e) => Row(
+                        children: [
+                          Radio(
+                            value: e,
+                            groupValue: selectedGender,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedGender = value;
+                              });
+                            },
+                          ),
+                          Text(
+                            '$e',
+                            style: TextStyle(
+                                color: Color(fontColorGray), fontSize: 14),
+                          ),
+                        ],
+                      ))
+                  .toList(),
+            ),
+            /*Container(
               child: TextField(
                 decoration: InputDecoration(
                   fillColor: Colors.white,
@@ -166,19 +209,30 @@ class _AssesmentcreateState extends State<Assesmentcreate> {
                   ),
                 ),
               ),
-            ),
-            Expanded(child: SizedBox(height: 40,)),
+            ),*/
+            Expanded(
+                child: SizedBox(
+              height: 40,
+            )),
             Container(
               width: MediaQuery.of(context).size.width,
-              child: RaisedButton(
-                child: Text("Next"),
+              child: MaterialButton(
+                color: Color(backgroundColorBlue),
+                minWidth: SizeConfig.screenWidth,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: Colors.blue),
+                ),
+                height: 48,
+                child: Text(
+                  "NEXT",
+                  style:
+                      GoogleFonts.openSans(color: Colors.white, fontSize: 16),
+                ),
                 textColor: Colors.white,
-                color: Colors.blue,
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AssesmentQuiz()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AssesmentQuiz()));
                 },
               ),
             )

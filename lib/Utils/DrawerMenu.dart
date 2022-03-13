@@ -58,13 +58,17 @@ class _DrawerMenuState extends State<DrawerMenu> {
                       child: getHomeContentModal.therapist != null &&
                               getHomeContentModal.therapist.photo != null &&
                               getHomeContentModal.therapist.photo != ""
-                          ? CachedNetworkImage(
-                              imageUrl: getHomeContentModal.mediaUrl +
-                                  getHomeContentModal.therapist.photo,
-                              fit: BoxFit.fill,
+                          ? ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: getHomeContentModal.mediaUrl +
+                                    getHomeContentModal.therapist.photo,
+                                fit: BoxFit.fill,
+                              ),
                             )
-                          : Image.network(
-                              'https://www.pngitem.com/pimgs/m/421-4212617_person-placeholder-image-transparent-hd-png-download.png'),
+                          : ClipOval(
+                              child: Image.network(
+                                  'https://www.pngitem.com/pimgs/m/421-4212617_person-placeholder-image-transparent-hd-png-download.png'),
+                            ),
                     ),
                   ),
                   Container(
@@ -87,7 +91,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                       top: SizeConfig.blockSizeVertical * 1.5,
                     ),
                     child: Text(
-                      "Profile complete",
+                      // "Profile complete",
+                      "Complete your profile  (60%)",
                       style: GoogleFonts.openSans(
                         color: Colors.white,
                         fontSize: SizeConfig.blockSizeVertical * 1.5,
@@ -102,10 +107,13 @@ class _DrawerMenuState extends State<DrawerMenu> {
                       left: SizeConfig.screenWidth * 0.2,
                       right: SizeConfig.screenWidth * 0.2,
                     ),
-                    child: LinearProgressIndicator(
-                      backgroundColor: Colors.blue,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      value: 0.6,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.black87,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        value: 0.6,
+                      ),
                     ),
                   ),
                 ],

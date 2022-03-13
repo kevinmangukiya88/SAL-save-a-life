@@ -8,13 +8,16 @@ import 'package:mental_health/Utils/Colors.dart';
 import 'package:mental_health/Utils/SizeConfig.dart';
 import 'package:mental_health/controller/availability_controller.dart';
 import 'package:mental_health/models/availabilityModel.dart';
+import 'package:mental_health/models/avalabilitymodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import 'Availabilty1.dart';
 
 class AvailabilityFirst extends StatefulWidget {
-  const AvailabilityFirst({Key key}) : super(key: key);
+  final List<Map<String, String>> response;
+
+  const AvailabilityFirst({Key key, this.response}) : super(key: key);
 
   @override
   _AvailabilityFirstState createState() => _AvailabilityFirstState();
@@ -39,7 +42,7 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
   DateTime selectedTimeFrom;
   DateTime selectedTimeTo;
   RxBool breakTime = false.obs;
-  RxBool isExpanded = true.obs;
+  RxBool isExpanded = false.obs;
   int startTimeIndex, endTimeIndex;
 
   @override
@@ -278,20 +281,27 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
       actions: [
         TextButton(
           onPressed: () async {
-            if (selectedTimeTo.difference(selectedTimeFrom).inMinutes == 0) {
+            if (selectedTimeTo.difference(selectedTimeFrom).inMinutes <= 0) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content:
                       Text('Please Select To Time Greater than From Time')));
               return;
             }
-            // AvailabilityModel model = AvailabilityModel();
-            // model.selectedDays = selectedDays;
-            // model.breakTime = breakTime.value;
-            // model.selectedTimeTo = selectedTimeTo;
-            // model.selectedTimeFrom = selectedTimeFrom;
-            // model.selectedDates = selectedDates;
+
+            if (selectedTimeFrom.difference(selectedTimeTo).inMinutes >= 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Please Select Less than To Time')));
+              return;
+            }
+            if (selectedDays.isEmpty) {
+              Get.showSnackbar(GetBar(
+                message: 'Please first select any one day',
+                duration: Duration(seconds: 2),
+              ));
+              return;
+            }
+
             setTimeSlot();
-            // Get.back();
           },
           child: Text(
             "Save",
@@ -312,11 +322,11 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
       DateTime dateTime =
           DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
       dateTime = setTime(dateTime);
-      if (dateTime.difference(selectedTimeFrom).inMinutes < 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Please Select Greater than From Time')));
-        return;
-      }
+      // if (dateTime.difference(selectedTimeFrom).inMinutes < 0) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //       SnackBar(content: Text('Please Select Greater than From Time')));
+      //   return;
+      // }
       setState(() {
         selectedTimeTo = dateTime;
       });
@@ -332,12 +342,6 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
       DateTime dateTime =
           DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
       dateTime = setTime(dateTime);
-
-      if (dateTime.difference(selectedTimeTo).inMinutes > 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Please Select Less than To Time')));
-        return;
-      }
       setState(() {
         selectedTimeFrom = dateTime;
       });
@@ -358,6 +362,7 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
   Future<void> setTimeSlot() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var id = prefs.getString("therapistid");
+    print('ID:$id');
     List<Map<String, dynamic>> requestList = [];
 
     startTimeIndex =
@@ -365,10 +370,33 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
     endTimeIndex =
         (selectedTimeTo.hour * 2) + (selectedTimeTo.minute == 30 ? 1 : 0);
     print('satrt index :$startTimeIndex , end index :$endTimeIndex');
+
+    bool existStatus = false;
+    for (String day in selectedDays) {
+      int i = widget.response
+          .indexWhere((element) => element['weekday'] == setWeekIndex(day));
+      if (i > -1) {
+        for (int index = startTimeIndex; index <= endTimeIndex; index++) {
+          int availableIndex = widget.response
+              .indexWhere((element) => element[index.toString()] == "1");
+          if (availableIndex > -1) {
+            existStatus = true;
+            break;
+          }
+        }
+      }
+    }
+    if (existStatus) {
+      Get.showSnackbar(GetBar(
+        message: 'Your slot time already added please change time',
+        duration: Duration(seconds: 2),
+      ));
+      return;
+    }
+
     for (String day in selectedDays) {
       Map<String, dynamic> mapData = {};
       int breakStatusCount = 0;
-      // bool breakStatus = false;
       for (int index = 0; index < 48; index++) {
         if (index >= startTimeIndex && index <= endTimeIndex) {
           if (breakTime.value && breakStatusCount == 2) {
@@ -384,12 +412,17 @@ class _AvailabilityFirstState extends State<AvailabilityFirst> {
       }
       mapData.addAll({'weekday': setWeekIndex(day)});
       mapData.addAll({'counsellor_id': id});
-      mapData.addAll({'availability_status': 'false'});
+      mapData.addAll({'availability_status': '1'});
       mapData.addAll({'status': '1'});
+      mapData.addAll({
+        'format':
+            '${DateFormat.jm().format(selectedTimeFrom)} - ${DateFormat.jm().format(selectedTimeTo)}'
+      });
       mapData.addAll({'break': breakTime.value ? '1' : '0'});
 
       requestList.add(mapData);
     }
+
     log('request:$requestList');
 
     await _controller.addAvailability(requestList);

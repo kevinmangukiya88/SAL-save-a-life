@@ -3,9 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mental_health/Utils/Colors.dart';
 import 'package:mental_health/Utils/SizeConfig.dart';
 import 'package:mental_health/UI/AddNewEvent.dart';
+import 'package:mental_health/models/get_topics_response_model.dart';
 
 class EventSummary extends StatefulWidget {
-  const EventSummary({Key key}) : super(key: key);
+  final GetTopicsResponseModel result;
+
+  const EventSummary({Key key, this.result}) : super(key: key);
 
   @override
   _EventSummaryState createState() => _EventSummaryState();
@@ -15,67 +18,67 @@ class _EventSummaryState extends State<EventSummary> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return SafeArea(child: Scaffold(
+    return SafeArea(
+        child: Scaffold(
       backgroundColor: Colors.white,
       bottomSheet: Container(
-        width: SizeConfig.screenWidth,
-        height: SizeConfig.screenHeight * 0.1,
-        padding: EdgeInsets.symmetric(
-          horizontal: SizeConfig.screenWidth * 0.04
-        ),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(7),
-              topLeft: Radius.circular(7),
-            ),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.grey[300],
-                  blurRadius: 9.0,
-                  spreadRadius: 4,
-                  offset: Offset(1,1)
-              ),
-            ]
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            MaterialButton(
-              onPressed: (){
-                Navigator.of(context).pushNamed('/CancelAppointment');
-              },
+          width: SizeConfig.screenWidth,
+          height: SizeConfig.screenHeight * 0.1,
+          padding:
+              EdgeInsets.symmetric(horizontal: SizeConfig.screenWidth * 0.04),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
               color: Colors.white,
-              minWidth: SizeConfig.screenWidth * 0.4,
-              child: Text("EDIT",style: GoogleFonts.openSans(
-                color: Color(fontColorGray),
-              ),),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-                side: BorderSide(
-                    color: Color(fontColorGray)
-                ),
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(7),
+                topLeft: Radius.circular(7),
               ),
-            ),
-            MaterialButton(
-              onPressed: (){Navigator.of(context).pushNamed('/EventSuccess');
-              },
-              color: Colors.blue,
-              minWidth: SizeConfig.screenWidth * 0.4,
-              child: Text("SUBMIT",style: GoogleFonts.openSans(
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey[300],
+                    blurRadius: 9.0,
+                    spreadRadius: 4,
+                    offset: Offset(1, 1)),
+              ]),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              MaterialButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/CancelAppointment');
+                },
                 color: Colors.white,
-              ),),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-                side: BorderSide(
-                    color: Colors.blue
+                minWidth: SizeConfig.screenWidth * 0.4,
+                child: Text(
+                  "EDIT",
+                  style: GoogleFonts.openSans(
+                    color: Color(fontColorGray),
+                  ),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: Color(fontColorGray)),
                 ),
               ),
-            ),
-          ],
-        )
-      ),
+              MaterialButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/EventSuccess');
+                },
+                color: Colors.blue,
+                minWidth: SizeConfig.screenWidth * 0.4,
+                child: Text(
+                  "SUBMIT",
+                  style: GoogleFonts.openSans(
+                    color: Colors.white,
+                  ),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: Colors.blue),
+                ),
+              ),
+            ],
+          )),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
@@ -95,7 +98,7 @@ class _EventSummaryState extends State<EventSummary> {
                     backgroundColor: Color(0XFFD8DFE9),
                     elevation: 0.0,
                     leading: InkWell(
-                      onTap:(){
+                      onTap: () {
                         Navigator.pop(context);
                       },
                       child: Icon(
@@ -104,11 +107,12 @@ class _EventSummaryState extends State<EventSummary> {
                       ),
                     ),
                     centerTitle: true,
-                    title: Text("Summary",
-                    style: TextStyle(
-                      color: Color(midnightBlue),
-                      fontWeight: FontWeight.w600
-                    ),),
+                    title: Text(
+                      "Summary",
+                      style: TextStyle(
+                          color: Color(midnightBlue),
+                          fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ],
               ),
@@ -116,9 +120,8 @@ class _EventSummaryState extends State<EventSummary> {
             Container(
               width: SizeConfig.screenWidth,
               margin: EdgeInsets.symmetric(
-                horizontal: SizeConfig.screenWidth * 0.03,
-                vertical: SizeConfig.blockSizeVertical
-              ),
+                  horizontal: SizeConfig.screenWidth * 0.03,
+                  vertical: SizeConfig.blockSizeVertical),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +173,7 @@ class _EventSummaryState extends State<EventSummary> {
                             ),
                             Container(
                               child: Text(
-                               eventDate.text,
+                                eventDate.text,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   color: Color(fontColorGray),
@@ -194,7 +197,7 @@ class _EventSummaryState extends State<EventSummary> {
                             ),
                             Container(
                               child: Text(
-                               eventTime.text,
+                                eventTime.text,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   color: Color(fontColorGray),
@@ -221,7 +224,7 @@ class _EventSummaryState extends State<EventSummary> {
                   Container(
                     width: SizeConfig.screenWidth,
                     child: Text(
-                     eventDesc.text,
+                      eventDesc.text,
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         color: Color(fontColorGray),
@@ -244,7 +247,7 @@ class _EventSummaryState extends State<EventSummary> {
                   Container(
                     width: SizeConfig.screenWidth,
                     child: Text(
-                     eventTopic.text,
+                      '${widget.result.topics.firstWhere((element) => element.id == eventTopic.text)?.topic}',
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         color: Color(fontColorGray),
@@ -266,7 +269,7 @@ class _EventSummaryState extends State<EventSummary> {
                   Container(
                     width: SizeConfig.screenWidth,
                     child: Text(
-                      priceValue.toString(),
+                      '$priceValue',
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         color: Color(fontColorGray),

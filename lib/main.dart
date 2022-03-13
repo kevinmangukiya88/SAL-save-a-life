@@ -36,10 +36,13 @@ import 'package:mental_health/UI/ProfessionalInfo2.dart';
 import 'package:mental_health/UI/Settings.dart';
 import 'package:mental_health/models/VerifyOtpModal.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'UI/AppointmentsTabBarView.dart';
 import 'UI/CancelAppointment.dart';
 import 'UI/LoginScreen.dart';
+import 'UI/SplashScreen.dart';
 import 'Utils/SharedPref.dart';
 import 'controller/availability_controller.dart';
+import 'controller/explore_controller.dart';
 
 Therapist getTherapistData;
 
@@ -58,12 +61,12 @@ class _MentalHealthState extends State<MentalHealth> {
   @override
   void initState() {
     super.initState();
-    getdetail();
-    getlogintoken().then((val) {
-      setState(() {
-        // _textFromFile = val;
-      });
-    });
+    // getdetail();
+    // getlogintoken().then((val) {
+    //   setState(() {
+    //     // _textFromFile = val;
+    //   });
+    // });
   }
 
   @override
@@ -74,7 +77,8 @@ class _MentalHealthState extends State<MentalHealth> {
         theme: ThemeData(
           fontFamily: 'OpenSans',
         ),
-        home: _textFromFile != null ? HomeMain() : LoginScreen(),
+        // home: _textFromFile != null ? HomeMain() : LoginScreen(),
+        home: SplashScreen(),
         routes: {
           '/Login': (context) => LoginScreen(),
           '/OTP': (context) => OTPScreen(),
@@ -97,6 +101,7 @@ class _MentalHealthState extends State<MentalHealth> {
           '/Home2': (context) => Home2(),
           '/KYC': (context) => KYCScreen(),
           '/HomeMain': (context) => HomeMain(),
+          '/AppointmentTabBarView': (context) => AppointmentTabBarView(),
           '/ExploreAll': (context) => ExploreAll(),
           '/Availability1': (context) => Availability(),
           '/Assessments': (context) => Assessments(),
@@ -123,8 +128,10 @@ class _MentalHealthState extends State<MentalHealth> {
   Future<void> getdetail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _textFromFile = prefs.getString("therapistid");
+    print('DATA :$_textFromFile');
   }
 
   ///controller initialize
   ShowTimesController _controller = Get.put(ShowTimesController());
+  ExploreController _exploreController = Get.put(ExploreController());
 }

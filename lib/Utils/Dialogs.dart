@@ -10,7 +10,7 @@ class Dialogs {
           return new WillPopScope(
               onWillPop: () async => false,
               child: SimpleDialog(
-                  key: key,
+                  // key: key,
                   elevation: 0.0,
                   backgroundColor: Colors.transparent,
                   children: <Widget>[

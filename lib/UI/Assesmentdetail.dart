@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mental_health/Utils/Colors.dart';
+import 'package:mental_health/Utils/SizeConfig.dart';
 
 import 'Assesmentcreate.dart';
 
@@ -164,19 +166,26 @@ class _AssesmantState extends State<AssesmantDetail> {
                 ),
               ),
               Expanded(child: SizedBox()),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: RaisedButton(
-                  child: Text("Start"),
-                  textColor: Colors.white,
-                  color: Colors.blue,
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Assesmentcreate()));
-                  },
+              MaterialButton(
+                color: Color(backgroundColorBlue),
+                minWidth: SizeConfig.screenWidth,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: Colors.blue),
                 ),
+                height: 48,
+                child: Text(
+                  "START",
+                  style:
+                      GoogleFonts.openSans(color: Colors.white, fontSize: 16),
+                ),
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Assesmentcreate()));
+                },
               )
             ],
           ),

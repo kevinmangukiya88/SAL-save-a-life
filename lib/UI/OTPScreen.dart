@@ -19,9 +19,9 @@ import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-
 class OTPScreen extends StatefulWidget {
   final String phoneNumber;
+
   const OTPScreen({Key key, this.phoneNumber}) : super(key: key);
 
   @override
@@ -31,7 +31,7 @@ class OTPScreen extends StatefulWidget {
 class _OTPScreenState extends State<OTPScreen> {
   final GlobalKey<State> loginLoader = new GlobalKey<State>();
 
-bool selected = false;
+  bool selected = false;
   FocusNode firstDigit;
   FocusNode secondDigit;
   FocusNode thirdDigit;
@@ -52,8 +52,8 @@ bool selected = false;
     secondDigit = FocusNode();
     thirdDigit = FocusNode();
     fourthDigit = FocusNode();
-
   }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -72,85 +72,98 @@ bool selected = false;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        floatingActionButton:FloatingActionButton(
-          child: Icon(Icons.arrow_forward_ios,color: Colors.white,),
-          backgroundColor: selected == true? Colors.blue : Colors.grey,
+        floatingActionButton: FloatingActionButton(
+            child: Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white,
+            ),
+            backgroundColor: selected == true ? Colors.blue : Colors.grey,
             onPressed: () async {
-              if (digit.isNotEmpty
-                ) {
-    Dialogs.showLoadingDialog(context, loginLoader);
-     {
-      final uri = 'https://yvsdncrpod.execute-api.ap-south-1.amazonaws.com/prod/verifyotp?phone=${widget.phoneNumber}&otp=${digit}';
-      var response = await Dio().get(uri,
-          // queryParameters:
-          // {'phone': phone, 'otp': otp},
-          options: Options(
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            followRedirects: false,
-          ));
-      try {
-        if (response.data['meta']['status'] != null) {
-          print(uri.toString());
-          print(response.data['meta']['status']);
-          if(response.data['meta']['status']=="200"){
-            print("ewjnlad");
-            print(response.data);
-            // Navigator.push(context, MaterialPageRoute(builder: (conext){
-            //   return Price1(getOtp:  firstController.text
-            //   );
-            // }));
-            if(response.data['listener']!=null){
-              SharedPreferences prefs=await SharedPreferences.getInstance();
-              prefs.setString("therapistid",response.data['listener']['listener_id'] );
-              prefs.remove("firstname");
-              prefs.remove("lastname");
-              prefs.setString("firstname",response.data['listener']['first_name']  );
-              prefs.setString("lastname",response.data['listener']['last_name']  );
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeMain()));
+              if (digit.isNotEmpty) {
+                Dialogs.showLoadingDialog(context, loginLoader);
+                {
+                  final uri =
+                      'https://yvsdncrpod.execute-api.ap-south-1.amazonaws.com/prod/verifyotp?phone=${widget.phoneNumber}&otp=${digit}';
+                  var response = await Dio().get(uri,
+                      // queryParameters:
+                      // {'phone': phone, 'otp': otp},
+                      options: Options(
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        followRedirects: false,
+                      ));
+                  log('OTP VERIFIED RESPONSE :${response.data}');
+                  try {
+                    if (response.data['meta']['status'] != null) {
+                      print(uri.toString());
+                      print(response.data['meta']['status']);
+                      if (response.data['meta']['status'] == "200") {
+                        print("ewjnlad");
+                        print(response.data);
+                        // Navigator.push(context, MaterialPageRoute(builder: (conext){
+                        //   return Price1(getOtp:  firstController.text
+                        //   );
+                        // }));
+                        if (response.data['listener'] != null) {
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          prefs.setString("therapistid",
+                              response.data['listener']['listener_id']);
+                          prefs.remove("firstname");
+                          prefs.remove("lastname");
+                          prefs.setString("firstname",
+                              response.data['listener']['first_name']);
+                          prefs.setString("lastname",
+                              response.data['listener']['last_name']);
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeMain()));
+                        } else if (response.data['therapist'] != null) {
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          prefs.setString("type", "Therapist");
+                          prefs.setString("therapistid",
+                              response.data['therapist']['therapist_id']);
+                          prefs.remove("firstname");
+                          prefs.remove("lastname");
+                          prefs.setString("firstname",
+                              response.data['therapist']['first_name']);
+                          prefs.setString("lastname",
+                              response.data['therapist']['last_name']);
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeMain()));
+                        } else {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (conext) {
+                            return Price1(/*getOtp:  firstController.text*/
+                                );
+                          }));
+                        }
+                      } else {
+                        print("ewjnawalad");
+                        Navigator.of(loginLoader.currentContext,
+                                rootNavigator: true)
+                            .pop();
+                        print(response.data['meta']['message']);
+                        showAlertDialog(
+                          context,
+                          response.data['meta']['message'],
+                          "",
+                        );
+                      }
 
-            }
-            else if(response.data['therapist']!=null){
-              SharedPreferences prefs=await SharedPreferences.getInstance();
-              prefs.setString("type", "Therapist");
-              prefs.setString("therapistid",response.data['therapist']['therapist_id'] );
-              prefs.remove("firstname");
-              prefs.remove("lastname");
-              prefs.setString("firstname",response.data['therapist'] ['first_name']);
-              prefs.setString("lastname",response.data['therapist']['last_name']);
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeMain()));
+                      final passEntity = VerifyOtpModal.fromJson(response.data);
 
-            }
-            else{
-     Navigator.push(context, MaterialPageRoute(builder: (conext){
-                          return Price1(getOtp:  firstController.text
-                          );
-                        }));
-           }
-
-          }
-          else{
-            print("ewjnawalad");
-            Navigator.of(loginLoader.currentContext,
-                rootNavigator: true)
-                .pop();
-            print(response.data['meta']['message']);
-            showAlertDialog(
-              context,
-              response.data['meta']['message'],
-              "",
-            );
-          }
-
-          final passEntity = VerifyOtpModal.fromJson(response.data);
-
-          return passEntity;
-        } else {
-          return VerifyOtpModal(meta: response.data);
-        }
-      } catch (error, stacktrace) {}
-    }
+                      return passEntity;
+                    } else {
+                      return VerifyOtpModal(meta: response.data);
+                    }
+                  } catch (error, stacktrace) {}
+                }
 //                 verifyOtp
 //                     .verifyOtp(
 //                   context: context,
@@ -236,7 +249,8 @@ bool selected = false;
 //                 toast("Otp is required");
 //               }
 
-    }} ),
+              }
+            }),
         body: Container(
           margin: EdgeInsets.only(
             left: SizeConfig.screenWidth * 0.05,
@@ -246,56 +260,60 @@ bool selected = false;
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Enter your \nVerification Code",style:
-                GoogleFonts.openSans(
+              Text(
+                "Enter your \nVerification Code",
+                style: GoogleFonts.openSans(
                   fontWeight: FontWeight.w600,
                   fontSize: SizeConfig.blockSizeVertical * 2.5,
                   color: Color(fontColorSteelGrey),
-                ),),
+                ),
+              ),
               SizedBox(
                 height: SizeConfig.blockSizeVertical,
               ),
-              Text("Sent to ${widget.phoneNumber}",style:
-              GoogleFonts.openSans(
-                fontWeight: FontWeight.w400,
-                fontSize: SizeConfig.blockSizeVertical * 1.5,
-                color: Color(fontColorGray),
-              ),),
-          // Container(
-          //   margin: EdgeInsets.symmetric(vertical: SizeConfig.blockSizeVertical * 2),
-          //
-          //   color: Colors.transparent,
-          //   child: PinCodeTextField(
-          //     controller: firstController,
-          //     keyboardType: TextInputType.number,
-          //     appContext: context,
-          //     length: 4,
-          //     onChanged: (value) {
-          //      setState(() {
-          //        firstController.text = value;
-          //        selected = true;
-          //      });
-          //       /*     controller.otpController.value.text =
-          //                         value.toString();*/
-          //     },
-          //     backgroundColor: Colors.transparent,
-          //     pinTheme: PinTheme(
-          //         inactiveColor: Color(backgroundColorBlue), borderWidth: 4),
-          //     textStyle: TextStyle(
-          //         color: colorBlack,
-          //         fontSize: 34,
-          //         fontWeight: FontWeight.bold),
-          //   ),
-          // ),
+              Text(
+                "Sent to ${widget.phoneNumber}",
+                style: GoogleFonts.openSans(
+                  fontWeight: FontWeight.w400,
+                  fontSize: SizeConfig.blockSizeVertical * 1.5,
+                  color: Color(fontColorGray),
+                ),
+              ),
+              // Container(
+              //   margin: EdgeInsets.symmetric(vertical: SizeConfig.blockSizeVertical * 2),
+              //
+              //   color: Colors.transparent,
+              //   child: PinCodeTextField(
+              //     controller: firstController,
+              //     keyboardType: TextInputType.number,
+              //     appContext: context,
+              //     length: 4,
+              //     onChanged: (value) {
+              //      setState(() {
+              //        firstController.text = value;
+              //        selected = true;
+              //      });
+              //       /*     controller.otpController.value.text =
+              //                         value.toString();*/
+              //     },
+              //     backgroundColor: Colors.transparent,
+              //     pinTheme: PinTheme(
+              //         inactiveColor: Color(backgroundColorBlue), borderWidth: 4),
+              //     textStyle: TextStyle(
+              //         color: colorBlack,
+              //         fontSize: 34,
+              //         fontWeight: FontWeight.bold),
+              //   ),
+              // ),
               OTPTextField(
                 length: 4,
                 width: MediaQuery.of(context).size.width,
                 textFieldAlignment: MainAxisAlignment.spaceAround,
 
                 fieldWidth: 55,
-              //  otpFieldStyle: OtpFieldStyle(focusBorderColor:Color(backgroundColorBlue),borderColor:Color(backgroundColorBlue),disabledBorderColor: Color(backgroundColorBlue),enabledBorderColor: Color(backgroundColorBlue)),
+                //  otpFieldStyle: OtpFieldStyle(focusBorderColor:Color(backgroundColorBlue),borderColor:Color(backgroundColorBlue),disabledBorderColor: Color(backgroundColorBlue),enabledBorderColor: Color(backgroundColorBlue)),
                 fieldStyle: FieldStyle.underline,
-           //     outlineBorderRadius: 20,
+                //     outlineBorderRadius: 20,
 
                 style: TextStyle(fontSize: 17),
                 onChanged: (pin) {
@@ -304,16 +322,15 @@ bool selected = false;
                 onCompleted: (pin) {
                   print("Completed: " + pin);
                   setState(() {
-                    selected=true;
+                    selected = true;
                   });
-                  digit=pin;
+                  digit = pin;
                   // Navigator.push(
                   //     context,
                   //     MaterialPageRoute(
                   //         builder: (context) => ProfessionalInfo1()));
                 },
               ),
-
 
 /*              Container(
                 margin: EdgeInsets.only(
@@ -453,9 +470,8 @@ bool selected = false;
                 height: SizeConfig.blockSizeVertical * 1.5,
               ),
               GestureDetector(
-                onTap: (){
-                  Dialogs.showLoadingDialog(
-                      context, loginLoader);
+                onTap: () {
+                  Dialogs.showLoadingDialog(context, loginLoader);
                   firstController.clear();
                   sendOtp
                       .sendOtp(
@@ -466,7 +482,7 @@ bool selected = false;
                     if (value != null) {
                       if (value.meta.status == "200") {
                         Navigator.of(loginLoader.currentContext,
-                            rootNavigator: true)
+                                rootNavigator: true)
                             .pop();
                         toast("OTP sent sucessfully");
                         /*  SharedPreferencesTest().checkIsLogin("0");
@@ -474,7 +490,7 @@ bool selected = false;
                                               .saveToken("set", value: value.token);*/
                       } else {
                         Navigator.of(loginLoader.currentContext,
-                            rootNavigator: true)
+                                rootNavigator: true)
                             .pop();
                         showAlertDialog(
                           context,
@@ -484,7 +500,7 @@ bool selected = false;
                       }
                     } else {
                       Navigator.of(loginLoader.currentContext,
-                          rootNavigator: true)
+                              rootNavigator: true)
                           .pop();
                       showAlertDialog(
                         context,
@@ -494,7 +510,7 @@ bool selected = false;
                     }
                   }).catchError((error) {
                     Navigator.of(loginLoader.currentContext,
-                        rootNavigator: true)
+                            rootNavigator: true)
                         .pop();
                     showAlertDialog(
                       context,
@@ -503,12 +519,14 @@ bool selected = false;
                     );
                   });
                 },
-                child: Text("RESEND OTP",style:
-                GoogleFonts.openSans(
-                  fontWeight: FontWeight.w700,
-                  fontSize: SizeConfig.blockSizeVertical * 1.5,
-                  color: Color(backgroundColorBlue),
-                ),),
+                child: Text(
+                  "RESEND OTP",
+                  style: GoogleFonts.openSans(
+                    fontWeight: FontWeight.w700,
+                    fontSize: SizeConfig.blockSizeVertical * 1.5,
+                    color: Color(backgroundColorBlue),
+                  ),
+                ),
               ),
             ],
           ),

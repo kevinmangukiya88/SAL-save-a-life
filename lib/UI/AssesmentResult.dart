@@ -1,5 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mental_health/Utils/Colors.dart';
+import 'package:mental_health/Utils/SizeConfig.dart';
 import 'package:mental_health/models/GetAvailableAssessmentModal.dart';
 import 'package:mental_health/UI/Assessments.dart';
 
@@ -39,6 +43,7 @@ class _AssesmentResultState extends State<AssesmentResult> {
       body: Container(
         margin: EdgeInsets.all(15),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               margin: EdgeInsets.all(15),
@@ -61,20 +66,58 @@ class _AssesmentResultState extends State<AssesmentResult> {
                     fontSize: 20),
               )),
             ),
-            Expanded(child: SizedBox()),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              child: RaisedButton(
-                child: Text("Try Again"),
-                textColor: Colors.white,
-                color: Colors.blue,
-                onPressed: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AssesmentQuiz()));
-                },
+            Spacer(),
+            Text(
+              'Past Assessment Result',
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'OpenSans'),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Text(
+                  '16/03/21-12:46 pm',
+                  style: TextStyle(fontSize: 16),
+                ),
+                Spacer(),
+                Icon(Icons.keyboard_arrow_down)
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Text(
+                  '16/03/21-12:46 pm',
+                  style: TextStyle(fontSize: 16),
+                ),
+                Spacer(),
+                Icon(Icons.keyboard_arrow_down)
+              ],
+            ),
+            Spacer(),
+            MaterialButton(
+              color: Color(backgroundColorBlue),
+              minWidth: SizeConfig.screenWidth,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(color: Colors.blue),
               ),
+              height: 48,
+              child: Text(
+                "TRY AGAIN",
+                style: GoogleFonts.openSans(color: Colors.white, fontSize: 16),
+              ),
+              textColor: Colors.white,
+              onPressed: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => AssesmentQuiz()));
+              },
             )
           ],
         ),

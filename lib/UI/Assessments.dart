@@ -15,7 +15,7 @@ class Assessments extends StatefulWidget {
 }
 
 class _AssessmentsState extends State<Assessments> {
-  var getAssessment  = GetAvailableAssessmentRepo();
+  var getAssessment = GetAvailableAssessmentRepo();
   List<AssessmentsList> assessmentModal = new List();
   bool isloading = true;
   List<String> imagesAssessments = [
@@ -71,7 +71,6 @@ class _AssessmentsState extends State<Assessments> {
       } else {
         setState(() {
           isloading = false;
-
         });
         showAlertDialog(
           context,
@@ -174,13 +173,13 @@ class _AssessmentsState extends State<Assessments> {
                                 cardTitle[index],
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.w600),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16),
                               ),
                               Text(
                                 time[index] + " mins",
                                 style: TextStyle(
-                                  color: Colors.white,
-                                ),
+                                    color: Colors.white, fontSize: 14),
                               ),
                             ],
                           ),
@@ -191,7 +190,9 @@ class _AssessmentsState extends State<Assessments> {
                 },
                 physics: NeverScrollableScrollPhysics(),
                 primary: false,
-                itemCount:assessmentModal != null && assessmentModal.length > 0 ?  assessmentModal.length : 0,
+                itemCount: assessmentModal != null && assessmentModal.length > 0
+                    ? assessmentModal.length
+                    : 0,
                 shrinkWrap: true,
               ),
             ),

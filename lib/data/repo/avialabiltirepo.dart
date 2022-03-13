@@ -8,6 +8,7 @@ class Avalabilityrepo extends BaseRepository {
   static Future<AvailabiltiyModel> avialabilityRepo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var id = prefs.getString("therapistid");
+    print('ID:$id');
     final uri =
         'https://yvsdncrpod.execute-api.ap-south-1.amazonaws.com/prod/therapist/availability?therapist_id=$id';
     var response = await Dio().get(uri,

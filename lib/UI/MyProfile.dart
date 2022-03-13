@@ -42,6 +42,7 @@ class _MyProfileState extends State<MyProfile> {
   var first;
   var last;
   var type;
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -52,6 +53,7 @@ class _MyProfileState extends State<MyProfile> {
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
+        padding: EdgeInsets.only(bottom: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,7 +117,10 @@ class _MyProfileState extends State<MyProfile> {
                                                     .therapist.price,
                                                 email: getprofilemodel
                                                     .therapist.email,
-                                                photo:getprofilemodel.mediaUrl+getprofilemodel.therapist.photo,
+                                                photo:
+                                                    getprofilemodel.mediaUrl +
+                                                        getprofilemodel
+                                                            .therapist.photo,
                                                 experience: getprofilemodel
                                                     .therapist.experience,
                                                 phone: getprofilemodel
@@ -161,8 +166,8 @@ class _MyProfileState extends State<MyProfile> {
                             child: Container(
                               margin: EdgeInsets.only(
                                   top: SizeConfig.screenHeight * 0.15),
-                              width: SizeConfig.screenWidth * 0.25,
-                              height: SizeConfig.screenHeight * 0.12,
+                              width: SizeConfig.screenWidth * 0.23,
+                              height: SizeConfig.screenWidth * 0.23,
                               decoration: BoxDecoration(
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(15),
@@ -179,7 +184,10 @@ class _MyProfileState extends State<MyProfile> {
                                                 getprofilemodel.therapist.photo,
                                             fit: BoxFit.fill,
                                           )
-                                        : Image.asset('assets/bg/profile.png')
+                                        : Image.asset(
+                                            'assets/bg/profile.png',
+                                            fit: BoxFit.fill,
+                                          )
                                     : getlistenermodel.listener != null &&
                                             getlistenermodel.listener.photo !=
                                                 null &&
@@ -257,27 +265,34 @@ class _MyProfileState extends State<MyProfile> {
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-
                                     Container(
-                                      child: isloding==true?CircularProgressIndicator(color: Colors.blue,):  Text(
-                                        type == "Therapist"
-                                            ? getprofilemodel.therapist.price ==
-                                                    "0"
-                                                ? "500"
-                                                : getprofilemodel.therapist.price.toString()
-                                            : getlistenermodel.listener.price ==
-                                                    "0"
-                                                ? "500"
-                                                : "${
-                                                    getlistenermodel
-                                                        .listener.price.toString()
-                                                  }",
-                                        style: GoogleFonts.openSans(
-                                            color: Color(backgroundColorBlue),
-                                            fontSize:
-                                                SizeConfig.blockSizeVertical * 4,
-                                            fontWeight: FontWeight.w600),
-                                      ),
+                                      child: isloding == true
+                                          ? CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.blue))
+                                          : Text(
+                                              type == "Therapist"
+                                                  ? getprofilemodel.therapist
+                                                              .price ==
+                                                          "0"
+                                                      ? "500"
+                                                      : getprofilemodel
+                                                          .therapist.price
+                                                          .toString()
+                                                  : getlistenermodel
+                                                              .listener.price ==
+                                                          "0"
+                                                      ? "500"
+                                                      : "${getlistenermodel.listener.price.toString()}",
+                                              style: GoogleFonts.openSans(
+                                                  color: Color(
+                                                      backgroundColorBlue),
+                                                  fontSize: SizeConfig
+                                                          .blockSizeVertical *
+                                                      4,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
                                     ),
                                     Text(
                                       "PRICE PER \nSESSION",
@@ -348,23 +363,28 @@ class _MyProfileState extends State<MyProfile> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(
-                                top: SizeConfig.blockSizeVertical * 2.5,
-                                left: SizeConfig.screenWidth * 0.05,
-                                right: SizeConfig.screenWidth * 0.05),
-                            child: Row(
-                              mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                              children: [
-                              Text(
-                                "AREA OF EXPERTISE",
-                                style: GoogleFonts.openSans(
+                              margin: EdgeInsets.only(
+                                  top: SizeConfig.blockSizeVertical * 2.5,
+                                  left: SizeConfig.screenWidth * 0.05,
+                                  right: SizeConfig.screenWidth * 0.05),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "AREA OF EXPERTISE",
+                                    style: GoogleFonts.openSans(
+                                        color: Color(fontColorGray),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize:
+                                            SizeConfig.blockSizeVertical * 2),
+                                  ),
+                                  Icon(
+                                    Icons.edit,
                                     color: Color(fontColorGray),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: SizeConfig.blockSizeVertical * 2),
-                              ),
-                              Icon(Icons.edit, color: Color(fontColorGray),)
-                            ],)
-                          ),
+                                  )
+                                ],
+                              )),
                           Container(
                             margin: EdgeInsets.only(
                                 left: SizeConfig.screenWidth * 0.05,
@@ -440,9 +460,10 @@ class _MyProfileState extends State<MyProfile> {
                                   style: GoogleFonts.openSans(
                                       color: Color(fontColorGray),
                                       fontWeight: FontWeight.w600,
-                                      fontSize: SizeConfig.blockSizeVertical * 2),
+                                      fontSize:
+                                          SizeConfig.blockSizeVertical * 2),
                                 ),
-                                Icon(Icons.edit,color:Color(fontColorGray))
+                                Icon(Icons.edit, color: Color(fontColorGray))
                               ],
                             ),
                           ),
@@ -533,7 +554,7 @@ class _MyProfileState extends State<MyProfile> {
               print(value.therapist.photo);
               getprofilemodel = value;
               print(getprofilemodel.therapist.education);
-            //  print(getprofilemodel.therapist.);
+              //  print(getprofilemodel.therapist.);
               first = getprofilemodel.therapist.firstName;
               last = getprofilemodel.therapist.lastName;
               print(getprofilemodel.therapist.firstName);

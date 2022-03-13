@@ -40,10 +40,11 @@ class _NavigationBarState extends State<NavigationBar> {
               },
               child: Container(
                 child: Image.asset(
-                  'assets/icons/nav home.png',
+                  'assets/icons/homeIcon.png',
                   color:
                       widget.index == 0 ? Colors.white : Color(fontColorGray),
-                  scale: SizeConfig.blockSizeVertical * 0.4,
+                  height: 30,
+                  width: 30,
                 ),
                 decoration: BoxDecoration(
                     color: widget.index == 0
@@ -58,16 +59,21 @@ class _NavigationBarState extends State<NavigationBar> {
         BottomNavigationBarItem(
             icon: InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return AppointmentTabBarView();
-                }));
+                Navigator.of(context)
+                    .pushReplacementNamed('/AppointmentTabBarView');
+
+                // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                //   return AppointmentTabBarView();
+                // }));
               },
               child: Container(
                 child: Image.asset(
-                  'assets/icons/nav booking.png',
+                  'assets/icons/bookingIcon.png',
                   color:
                       widget.index == 1 ? Colors.white : Color(fontColorGray),
-                  scale: SizeConfig.blockSizeVertical * 0.4,
+                  // scale: SizeConfig.blockSizeVertical * 0.05,
+                  height: 30,
+                  width: 30,
                 ),
                 decoration: BoxDecoration(
                     color: widget.index == 1
@@ -86,9 +92,11 @@ class _NavigationBarState extends State<NavigationBar> {
             },
             child: Container(
               child: Image.asset(
-                'assets/icons/nav explore.png',
+                'assets/icons/exploreIcon.png',
                 scale: SizeConfig.blockSizeVertical * 0.4,
                 color: widget.index == 2 ? Colors.white : Color(fontColorGray),
+                height: 30,
+                width: 30,
               ),
               decoration: BoxDecoration(
                   color: widget.index == 2
@@ -108,10 +116,12 @@ class _NavigationBarState extends State<NavigationBar> {
               },
               child: Container(
                 child: Image.asset(
-                  'assets/icons/nav cafe.png',
+                  'assets/icons/cafeIcon.png',
                   scale: SizeConfig.blockSizeVertical * 0.4,
                   color:
                       widget.index == 3 ? Colors.white : Color(fontColorGray),
+                  height: 30,
+                  width: 30,
                 ),
                 decoration: BoxDecoration(
                     color: widget.index == 3

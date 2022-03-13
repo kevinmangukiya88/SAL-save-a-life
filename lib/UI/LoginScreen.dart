@@ -207,8 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   mobileController.text,
                                             );
                                           }));
-                                        }
-                                        else {
+                                        } else {
                                           Navigator.of(
                                                   loginLoader.currentContext,
                                                   rootNavigator: true)
@@ -230,7 +229,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                         );
                                       }
                                     }).catchError((error) {
-
                                       // Navigator.of(loginLoader.currentContext,
                                       //         rootNavigator: true)
                                       //     .pop();
